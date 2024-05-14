@@ -18,6 +18,7 @@ knitr::opts_chunk$set(
 # ctasval
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/IMPALA-Consortium/ctasval/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/IMPALA-Consortium/ctasval/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of ctasval is to provide structured code to validate {ctas} performance on study data.
@@ -29,81 +30,41 @@ You can install the development version of ctasval from [GitHub](https://github.
 ``` r
 # install.packages("devtools")
 devtools::install_github("IMPALA-Consortium/ctasval")
-devtools::install_github("Gilead-BioStats/clindata")
 ```
 
 ## Example
 
+
 ```{r}
-df_lb <- clindata::rawplus_lb
-df_dm <- clindata::rawplus_dm
 
-data <- df_lb %>%
-  mutate(
-    timepoint_rank = rank(visnum),
-    timepoint_1_name = as.character(visnum),
-    result = siresn,
-    parameter_id = lbtstnam,
-    timepoint_2_name = "no",
-    baseline = NA,
-    parameter_category_1 = battrnam
-  ) %>%
-  inner_join(
-    df_dm %>%
-      distinct(subjid, siteid)
-  ) %>%
-  rename(
-    subject_id = subjid,
-    site = siteid
-  )
+library(pharmaversesdtm)
+library(dplyr)
+library(future)
+library(ctasval)
 
-parameters <- data %>%
-  distinct(
-    parameter_id,
-    parameter_name,
-    parameter_category_1
-  ) %>%
-  mutate(
-    parameter_category_2 = "no",
-    parameter_category_3 = "no",
-    time_point_count_min = NA,
-    subject_count_min = NA,
-    max_share_missing = NA,
-    generate_change_from_baseline = NA,
-    timeseries_features_to_calculate = NA,
-    use_only_custom_timeseries = NA
-  )
 
-subjects <- data %>%
-  distinct(subject_id, site) %>%
-  mutate(
-    country = "no",
-    region = "no"
-  )
+df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
-feats <- c(
-    "autocorr",
-    "average",
-    "own_site_simil_score",
-    "sd",
-    "unique_value_count_relative",
-    "lof",
-    "range"
-  ) %>%
-  paste(collapse = ";")
+df_filt <- df_prep %>%
+  filter(parameter_id %in% c("Alkaline Phosphatase", "Alanine Aminotransferase"))
 
-ls_ctas <- process_a_study(
-  data = data,
-  subjects = subjects,
-  parameters = parameters,
-  custom_timeseries = ctas_data$custom_timeseries,
-  custom_reference_groups = ctas_data$custom_reference_groups,
-  default_timeseries_features_to_calculate = feats,
-  default_minimum_timepoints_per_series = 3,
-  default_minimum_subjects_per_series = 3,
-  default_max_share_missing_timepoints_per_series = 0.5,
-  default_generate_change_from_baseline = FALSE,
-  autogenerate_timeseries = TRUE
+plan(multisession, workers = 6)
+
+ctas <- ctasval(
+  df = df_filt,
+  fun_anomaly = c(anomaly_average, anomaly_sd),
+  feats = c("average", "sd"),
+  parallel = TRUE,
+  iter = 100
 )
+
+plan(sequential)
+
+ctas
+```
+
+
+```{r}
+
 ```
 
