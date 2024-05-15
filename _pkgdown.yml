@@ -2,3 +2,23 @@ url: https://impala-consortium.github.io/ctasval/
 template:
   bootstrap: 5
 
+reference:
+  - title: Anomaly Functions
+    desc: ~
+    contents:
+      - starts_with("anomaly_")
+  - title: Main Function
+    desc: ~
+    contents:
+      - ctasval
+  - title: Data Preparation
+    desc: ~
+    contents:
+      - prep_sdtm_lb
+
+navbar:
+  structure:
+    left:
+    - home
+    - reference
+    right: github

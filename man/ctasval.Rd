@@ -60,15 +60,16 @@ This function performs CTAS validation by generating anomalies, calculating scor
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
 df_filt <- df_prep \%>\%
-  filter(parameter_id  == "Alkaline Phosphatase")
+  filter(parameter_id == "Alkaline Phosphatase")
 
 ctas <- ctasval(
   df = df_filt,
   fun_anomaly = c(anomaly_average, anomaly_sd),
   feats = c("average", "sd"),
-  parallel = TRUE,
+  parallel = FALSE,
   iter = 1
 )
 
 ctas
+
 }

@@ -18,23 +18,24 @@ prep_sdtm_lb <- function(lb, dm, scramble = TRUE) {
 
   df_prep <- lb %>%
     mutate(
-      timepoint_rank = VISITNUM,
-      timepoint_1_name = as.character(VISIT),
-      result = LBSTRESN,
-      parameter_id = LBTEST,
-      parameter_name = LBTEST,
+      timepoint_rank = .data$VISITNUM,
+      timepoint_1_name = as.character(.data$VISIT),
+      result = .data$LBSTRESN,
+      parameter_id = .data$LBTEST,
+      parameter_name = .data$LBTEST,
       timepoint_2_name = "no",
       baseline = NA,
-      parameter_category_1 = LBCAT
+      parameter_category_1 = .data$LBCAT
     ) %>%
     inner_join(
       dm %>%
-        distinct(USUBJID, SITEID)
+        distinct(.data$USUBJID, .data$SITEID),
+      by = c("USUBJID")
     ) %>%
-    rename(
-      subject_id = USUBJID,
-      site = SITEID
-    )
+    rename(c(
+      subject_id = "USUBJID",
+      site = "SITEID"
+    ))
 
   return(df_prep)
 }
@@ -62,9 +63,9 @@ get_ctas <- function(df, feats,
 
   parameters <- df %>%
     distinct(
-      parameter_id,
-      parameter_name,
-      parameter_category_1
+      .data$parameter_id,
+      .data$parameter_name,
+      .data$parameter_category_1
     ) %>%
     mutate(
       parameter_category_2 = "no",
@@ -78,22 +79,22 @@ get_ctas <- function(df, feats,
     )
 
   subjects <- df %>%
-    distinct(subject_id, site) %>%
+    distinct(.data$subject_id, .data$site) %>%
     mutate(
       country = "no",
       region = "no"
     )
 
   data <- df %>%
-    select(
-      subject_id,
-      parameter_id,
-      timepoint_1_name,
-      timepoint_2_name,
-      timepoint_rank,
-      result,
-      baseline
-    )
+    select(c(
+      "subject_id",
+      "parameter_id",
+      "timepoint_1_name",
+      "timepoint_2_name",
+      "timepoint_rank",
+      "result",
+      "baseline"
+    ))
 
   ls_ctas <- ctas::process_a_study(
     data = data,
@@ -111,16 +112,19 @@ get_ctas <- function(df, feats,
 
   data_ctas_prep <- ls_ctas$site_scores %>%
     left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
-    summarise(score = max(fdr_corrected_pvalue_logp), .by = c("site", "parameter_id"))
+    summarise(
+      score = max(.data$fdr_corrected_pvalue_logp),
+      .by = c("site", "parameter_id")
+    )
 
   data_ctas <- df %>%
-    distinct(site, parameter_id) %>%
+    distinct(.data$site, .data$parameter_id) %>%
     left_join(
       data_ctas_prep,
       by = c("site", "parameter_id")
     ) %>%
     mutate(
-      score = ifelse(is.na(score), 0, score)
+      score = ifelse(is.na(.data$score), 0, .data$score)
     )
 
   return(data_ctas)
@@ -139,11 +143,11 @@ sample_site <- function(df, site = "sample_site") {
 
   df_n_sites <- df %>%
     summarise(
-      n_pat_site_param = n_distinct(subject_id),
-      .by = c(site, parameter_id)
+      n_pat_site_param = n_distinct(.data$subject_id),
+      .by = c("site", "parameter_id")
     ) %>%
-    slice_sample(n = 1, by = parameter_id) %>%
-    select(parameter_id, n_pat_site_param)
+    slice_sample(n = 1, by = "parameter_id") %>%
+    select(c("parameter_id", "n_pat_site_param"))
 
   subject_id <- unique(df$subject_id)
 
@@ -157,69 +161,27 @@ sample_site <- function(df, site = "sample_site") {
 
   df_sample_site <- df %>%
     mutate(
-      subject_random = subj_rdn_id[df$subject_id]
+      subject_random = subj_rdn_id[.data$subject_id]
     ) %>%
     mutate(
-      subject_random = dense_rank(subject_random),
+      subject_random = dense_rank(.data$subject_random),
       .by = "parameter_id"
     ) %>%
     left_join(
       df_n_sites,
       by = "parameter_id"
     ) %>%
-    filter(subject_random <= n_pat_site_param) %>%
+    filter(.data$subject_random <= .data$n_pat_site_param) %>%
     mutate(
       site = .env$site,
-      subject_id = paste0(site, "-", subject_id)
-    )
+      subject_id = paste0(.data$site, "-", .data$subject_id)
+    ) %>%
+    select(- c("subject_random", "n_pat_site_param"))
 
   return(df_sample_site)
 }
 
-#' Add Average Anomalies
-#'
-#' This function adds average anomalies to the `result` column of the data frame.
-#'
-#' @param df Data frame containing the study data.
-#' @param anomaly_degree Degree of anomaly to add.
-#' @param site The site to sample from. Default is "sample_site".
-#' @return A data frame with added anomalies.
-#' @export
-anomaly_average <- function(df, anomaly_degree, site = "sample_site") {
 
-  sample_data <- sample_site(df, site) %>%
-    mutate(
-      result = result + mean(result, na.rm = TRUE) * anomaly_degree,
-      method = "average",
-      .by = c("parameter_id", "subject_id")
-    )
-
-  return(sample_data)
-}
-
-#' Add Standard Deviation Anomalies
-#'
-#' This function adds standard deviation anomalies to the `result` column of the data frame.
-#'
-#' @param df Data frame containing the study data.
-#' @param anomaly_degree Degree of anomaly to add.
-#' @param site The site to sample from. Default is "sample_site".
-#' @return A data frame with added anomalies.
-#' @export
-anomaly_sd <- function(df, anomaly_degree, site = "sample_site") {
-  sample_data <- sample_site(df, site) %>%
-    mutate(
-      rbin = sample(c(1, -1), replace = TRUE, nrow(.))
-    ) %>%
-    mutate(
-      result = result + (mean(result, na.rm = TRUE) * anomaly_degree * rbin),
-      method = "sd",
-      .by = c("parameter_id", "subject_id")
-    ) %>%
-    select(-rbin)
-
-  return(sample_data)
-}
 
 #' Generate Anomaly Data
 #'
@@ -240,7 +202,7 @@ get_anomaly_data <- function(df, n_sites, fun_anomaly, anomaly_degree, site_pref
   ) %>%
     mutate(
       site_data = purrr::map(
-        site_anomaly,
+        .data$site_anomaly,
         ~ fun_anomaly(
           df = df,
           anomaly_degree = anomaly_degree,
@@ -251,7 +213,7 @@ get_anomaly_data <- function(df, n_sites, fun_anomaly, anomaly_degree, site_pref
 
   df_anomaly <- bind_rows(df, grid$site_data) %>%
     mutate(
-      method = max(method, na.rm = TRUE)
+      method = max(.data$method, na.rm = TRUE)
     )
 
   return(df_anomaly)
@@ -300,23 +262,25 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
     autogenerate_timeseries = autogenerate_timeseries
   ) %>%
     mutate(
-      is_P = startsWith(site, "sample_site")
+      is_P = startsWith(.data$site, "sample_site")
     )
 
   if (!is.null(thresh)) {
     df_thresh <- df_ctas %>%
       mutate(
         classification = case_when(
-          is_P & score >= thresh ~ "TP",
-          is_P & score < thresh ~ "FN",
-          score >= thresh ~ "FP",
+          .data$is_P & .data$score >= thresh ~ "TP",
+          .data$is_P & .data$score < thresh ~ "FN",
+          .data$score >= thresh ~ "FP",
           TRUE ~ "TN"
-        )
+        ),
+        classification = factor(.data$classification, levels = c("TP", "FN", "FP", "TN"))
       ) %>%
       summarise(
-        n = n_distinct(site),
-        .by = c("parameter_id", "classification")
+        n = n_distinct(.data$site),
+        .by = c("parameter_id", "classification"),
       ) %>%
+      complete(.data$classification, .data$parameter_id, fill = list(n = 0)) %>%
       pivot_wider(names_from = "classification", values_from = "n", values_fill = 0)
 
     df_result <- df_thresh
@@ -324,10 +288,18 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
     df_result <- df_ctas
   }
 
+  df_anomaly_filt <- df_anomaly %>%
+    filter(startsWith(.data$site, "sample_site")) %>%
+    left_join(
+      df_ctas %>%
+        distinct(.data$site, .data$parameter_id, .data$score),
+        by = c("site", "parameter_id")
+    )
+
   structure(
     list(
       result = df_result,
-      anomaly = filter(df_anomaly, startsWith(site, "sample_site"))
+      anomaly = df_anomaly_filt
     ),
     class = "ctasval_single"
   )
@@ -357,17 +329,18 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
 #' df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 #'
 #' df_filt <- df_prep %>%
-#'   filter(parameter_id  == "Alkaline Phosphatase")
+#'   filter(parameter_id == "Alkaline Phosphatase")
 #'
 #' ctas <- ctasval(
 #'   df = df_filt,
 #'   fun_anomaly = c(anomaly_average, anomaly_sd),
 #'   feats = c("average", "sd"),
-#'   parallel = TRUE,
+#'   parallel = FALSE,
 #'   iter = 1
 #' )
 #'
 #' ctas
+#'
 ctasval <- function(df,
                     fun_anomaly,
                     feats,
@@ -395,8 +368,11 @@ ctasval <- function(df,
 
   if (parallel) {
     fun_purrr <- furrr::future_pmap
+    purrr_args <- list(.options = furrr::furrr_options(seed = TRUE))
   } else {
     fun_purrr <- purrr::pmap
+    purrr_args <- list()
+
   }
 
   simaerep::with_progress_cnd(
@@ -416,6 +392,7 @@ ctasval <- function(df,
             default_generate_change_from_baseline = default_generate_change_from_baseline,
             autogenerate_timeseries = autogenerate_timeseries
           ),
+          .purrr_args = purrr_args,
           .steps = nrow(df_grid),
           .progress = progress
         )
@@ -424,23 +401,23 @@ ctasval <- function(df,
   )
 
   df_perf <- df_result %>%
-    mutate(ctas = map(ctas, "result")) %>%
-    unnest(ctas) %>%
+    mutate(ctas = map(.data$ctas, "result")) %>%
+    unnest("ctas") %>%
     summarise(
-      across(c(TN, FN, FP, TP),
+      across(c("TN", "FN", "FP", "TP"),
              ~ sum(., na.rm = TRUE)),
-      .by = c(anomaly_degree, feats, parameter_id)
+      .by = c("anomaly_degree", "feats", "parameter_id")
     ) %>%
     rowwise() %>%
     mutate(
-      tpr = TP / (TP + FN),
-      fpr = FP / (FP + TN)
+      tpr = .data$TP / (.data$TP + .data$FN),
+      fpr = .data$FP / (.data$FP + .data$TN)
     ) %>%
     ungroup()
 
   df_anomaly <- df_result %>%
-    mutate(ctas = map(ctas, "anomaly")) %>%
-    unnest(ctas)
+    mutate(ctas = map(.data$ctas, "anomaly")) %>%
+    unnest("ctas")
 
   structure(
     list(

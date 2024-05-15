@@ -32,8 +32,11 @@ You can install the development version of ctasval from [GitHub](https://github.
 devtools::install_github("IMPALA-Consortium/ctasval")
 ```
 
-## Example
+## ctasval
 
+`ctasval` adds three anomalous sites to the data set for each iteration and tries to detect them using {ctas}.
+It samples from the study site pool to first determine the number of patients and then samples a sufficient
+number of patients from the study patient pool.
 
 ```{r}
 
@@ -42,6 +45,8 @@ library(dplyr)
 library(future)
 library(ctasval)
 
+
+set.seed(1)
 
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
@@ -55,7 +60,10 @@ ctas <- ctasval(
   fun_anomaly = c(anomaly_average, anomaly_sd),
   feats = c("average", "sd"),
   parallel = TRUE,
-  iter = 100
+  iter = 100,
+  n_sites = 3,
+  anomaly_degree = c(0, 0.5, 1, 2, 10, 50),
+  thresh = 1
 )
 
 plan(sequential)
@@ -63,8 +71,32 @@ plan(sequential)
 ctas
 ```
 
+### Performance Metrics
 
 ```{r}
-
+ctas$result %>%
+  knitr::kable(digits = 3)
 ```
 
+### Anamolous Sites
+
+Anomalous Sites and their scores can be reviewed.
+
+```{r}
+ctas$anomaly %>%
+  select(
+    iter,
+    anomaly_degree,
+    feats,
+    parameter_id,
+    site,
+    subject_id,
+    timepoint_rank,
+    result,
+    score
+  ) %>%
+  arrange(iter, desc(anomaly_degree), parameter_id, feats, site, subject_id, timepoint_rank) %>%
+  head(50) %>%
+  knitr::kable()
+
+```

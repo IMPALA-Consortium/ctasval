@@ -1,9 +1,19 @@
 Package: ctasval
 Title: Validate ctas
-Version: 0.0.0.9000
-Authors@R: 
-    person("First", "Last", , "first.last@example.com", role = c("aut", "cre"),
-           comment = c(ORCID = "YOUR-ORCID-ID"))
+Version: 0.0.1
+Authors@R: c(
+  person("Björn", "Koneswarakantha",
+    role = c("aut", "cre"),
+    email = "bjoern.koneswarakantha@roche.com"),
+  person("Pekka", "Tiikkainen",
+    role = c("aut"),
+    email = "pekka.tiikkainen@bayer.com"),
+  person("Frederik", "Colin",
+    role = c("aut"),
+    email = "frederik_raphael.collin@boehringer-ingelheim.com"),
+  person("IMPALA",
+    role = "cph")
+  )
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
@@ -19,4 +29,8 @@ Imports:
   ctas,
   rlang
 Suggests:
-  pharmaversesdtm
+    pharmaversesdtm,
+    testthat (>= 3.0.0),
+    ggplot2,
+    pkgdown
+Config/testthat/edition: 3
