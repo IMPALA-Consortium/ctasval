@@ -29,6 +29,7 @@ You can install the development version of ctasval from [GitHub](https://github.
 
 ``` r
 # install.packages("devtools")
+devtools::install_github("IMPALA-Consortium/ctas")
 devtools::install_github("IMPALA-Consortium/ctasval")
 ```
 
