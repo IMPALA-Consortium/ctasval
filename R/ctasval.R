@@ -23,9 +23,53 @@ prep_sdtm_lb <- function(lb, dm, scramble = TRUE) {
       result = .data$LBSTRESN,
       parameter_id = .data$LBTEST,
       parameter_name = .data$LBTEST,
+      #parameter_id = ifelse(test=rep(('LBSPID' %in% names(.data)),length.out=length(.data$LBTEST)),yes=.data$LBSPID,no=.data$LBTEST),
+      #parameter_name = ifelse(rep(('LBSPID' %in% names(.data)),length.out=length(.data$LBTEST)),.data$LBSPID,.data$LBTEST),
       timepoint_2_name = "no",
       baseline = NA,
       parameter_category_1 = .data$LBCAT
+    ) %>%
+    inner_join(
+      dm %>%
+        distinct(.data$USUBJID, .data$SITEID),
+      by = c("USUBJID")
+    ) %>%
+    rename(c(
+      subject_id = "USUBJID",
+      site = "SITEID"
+    ))
+
+  return(df_prep)
+}
+
+#' Prepare SDTM VS Data
+#'
+#' This function prepares the VS (Vital Sign) data for SDTM (Study Data Tabulation Model) by merging it with the DM (Demographics) data.
+#'
+#' @param vs Data frame containing the VS data.
+#' @param dm Data frame containing the DM data.
+#' @param scramble Logical indicating whether to scramble the SITEID in the DM data. Default is TRUE.
+#' @return A data frame with the prepared SDTM LB data.
+#' @export
+prep_sdtm_vs <- function(vs, dm, scramble = TRUE) {
+  if (scramble) {
+    dm$SITEID <- sample(
+      dm$SITEID,
+      replace = FALSE,
+      size = length(dm$SITEID)
+    )
+  }
+
+  df_prep <- vs %>%
+    mutate(
+      timepoint_rank = .data$VISITNUM,
+      timepoint_1_name = as.character(.data$VISIT),
+      result = .data$VSSTRESN,
+      parameter_id = .data$VSTEST,
+      parameter_name = .data$VSTEST,
+      timepoint_2_name = "no",
+      baseline = NA,
+      parameter_category_1 = ifelse(rep(('VSCAT' %in% names(.data)),length.out=length(.data$VSTEST)),.data$VSCAT,"no categories")
     ) %>%
     inner_join(
       dm %>%
@@ -360,8 +404,10 @@ ctasval <- function(df,
 
   df_grid <- tibble(
     iter = seq(1, iter),
-    anomaly_degree = list(c(0, 0.5, 1, 2, 5, 10, 50)),
-    fun_anomaly = list(tibble(fun_anomaly = c(anomaly_sd, anomaly_average), feats = c("sd", "average")))
+    #anomaly_degree = list(c(0, 0.5, 1, 5, 10, 50)),
+    anomaly_degree = list(anomaly_degree),
+    #fun_anomaly = list(tibble(fun_anomaly = c(anomaly_sd, anomaly_average), feats = c("sd", "average")))
+    fun_anomaly = list(tibble(fun_anomaly = fun_anomaly, feats = feats))
   ) %>%
     unnest(anomaly_degree) %>%
     unnest(fun_anomaly)
