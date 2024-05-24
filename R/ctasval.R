@@ -401,9 +401,7 @@ ctasval <- function(df,
 
   df_grid <- tibble(
     iter = seq(1, iter),
-    #anomaly_degree = list(c(0, 0.5, 1, 5, 10, 50)),
     anomaly_degree = list(anomaly_degree),
-    #fun_anomaly = list(tibble(fun_anomaly = c(anomaly_sd, anomaly_average), feats = c("sd", "average")))
     fun_anomaly = list(tibble(fun_anomaly = fun_anomaly, feats = feats))
   ) %>%
     unnest(anomaly_degree) %>%
