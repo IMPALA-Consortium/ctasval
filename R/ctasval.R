@@ -23,8 +23,6 @@ prep_sdtm_lb <- function(lb, dm, scramble = TRUE) {
       result = .data$LBSTRESN,
       parameter_id = .data$LBTEST,
       parameter_name = .data$LBTEST,
-      #parameter_id = ifelse(test=rep(('LBSPID' %in% names(.data)),length.out=length(.data$LBTEST)),yes=.data$LBSPID,no=.data$LBTEST),
-      #parameter_name = ifelse(rep(('LBSPID' %in% names(.data)),length.out=length(.data$LBTEST)),.data$LBSPID,.data$LBTEST),
       timepoint_2_name = "no",
       baseline = NA,
       parameter_category_1 = .data$LBCAT
@@ -69,7 +67,7 @@ prep_sdtm_vs <- function(vs, dm, scramble = TRUE) {
       parameter_name = .data$VSTEST,
       timepoint_2_name = "no",
       baseline = NA,
-      parameter_category_1 = ifelse(rep(('VSCAT' %in% names(.data)),length.out=length(.data$VSTEST)),.data$VSCAT,"no categories")
+      parameter_category_1 = rep("no categories",length.out=length(.data$VSTEST))
     ) %>%
     inner_join(
       dm %>%
@@ -399,7 +397,6 @@ ctasval <- function(df,
                     default_max_share_missing_timepoints_per_series = 0.5,
                     default_generate_change_from_baseline = FALSE,
                     autogenerate_timeseries = TRUE) {
-
   stopifnot("Each 'fun_anomaly' must be paired with one 'feats'" = length(fun_anomaly) == length(feats))
 
   df_grid <- tibble(
