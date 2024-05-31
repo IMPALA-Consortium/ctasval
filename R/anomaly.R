@@ -1,4 +1,4 @@
-#' Create site with anomolous patients
+#' Create site with anomalous patients
 #'
 #' Average
 #'
@@ -25,7 +25,6 @@
 #' coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
 #'
 anomaly_average <- function(df, anomaly_degree, site = "sample_site") {
-
   sample_data <- sample_site(df, site) %>%
     mutate(
       result = .data$result + mean(.data$result, na.rm = TRUE) * .env$anomaly_degree,
