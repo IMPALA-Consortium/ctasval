@@ -3,11 +3,14 @@
 \name{anomaly_average}
 \alias{anomaly_average}
 \alias{anomaly_sd}
-\title{Create site with anomolous patients}
+\alias{anomaly_autocorr}
+\title{Create site with anomalous patients}
 \usage{
 anomaly_average(df, anomaly_degree, site = "sample_site")
 
 anomaly_sd(df, anomaly_degree, site = "sample_site")
+
+anomaly_autocorr(df, anomaly_degree, site = "sample_site")
 }
 \arguments{
 \item{df}{Data frame containing the study data.}
@@ -47,6 +50,21 @@ df_filt <- df_prep \%>\%
   filter(parameter_id == "Alkaline Phosphatase")
 
 df_anomaly <- anomaly_sd(df_filt, anomaly_degree = 2, site = "anomolous")
+
+ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
+geom_line(color = "black") +
+geom_line(data = df_anomaly, color = "tomato") +
+coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
+
+set.seed(1)
+library(ggplot2)
+
+df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
+
+df_filt <- df_prep \%>\%
+  filter(parameter_id == "Alkaline Phosphatase")
+
+df_anomaly <- anomaly_autocorr(df_filt, anomaly_degree = 2, site = "anomolous")
 
 ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
 geom_line(color = "black") +

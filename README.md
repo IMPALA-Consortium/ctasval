@@ -43,6 +43,7 @@ library(dplyr)
 #>     intersect, setdiff, setequal, union
 library(future)
 library(ctasval)
+library(stringr)
 
 
 set.seed(1)
@@ -50,55 +51,68 @@ set.seed(1)
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
 df_filt <- df_prep %>%
-  filter(parameter_id %in% c("Alkaline Phosphatase", "Alanine Aminotransferase"))
+  filter(parameter_id %in% c("Alkaline Phosphatase", "Alanine Aminotransferase")) %>%
+  filter(! grepl("UNSCH", VISIT))
 
 plan(multisession, workers = 6)
 
 ctas <- ctasval(
   df = df_filt,
-  fun_anomaly = c(anomaly_average, anomaly_sd),
-  feats = c("average", "sd"),
+  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr),
+  feats = c("average", "sd", "autocorr"),
   parallel = TRUE,
   iter = 100,
   n_sites = 3,
-  anomaly_degree = c(0, 0.5, 1, 2, 10, 50),
+  anomaly_degree = c(0, 0.1, 0.25, 0.5, 1, 2, 5),
   thresh = 1
 )
+#> Warning: There were 700 warnings in `mutate()`.
+#> The first warning was:
+#> ℹ In argument: `ctas = simaerep::purrr_bar(...)`.
+#> Caused by warning:
+#> ! There were 7 warnings in `mutate()`.
+#> The first warning was:
+#> ℹ In argument: `ts_features = list(...)`.
+#> ℹ In row 2.
+#> Caused by warning in `cor()`:
+#> ! the standard deviation is zero
+#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 6 remaining warnings.
+#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 699 remaining warnings.
 
 plan(sequential)
 
 ctas
 #> $result
-#> # A tibble: 28 × 9
-#>    anomaly_degree feats   parameter_id      TN    FN    FP    TP     tpr     fpr
-#>             <dbl> <chr>   <chr>          <int> <int> <int> <int>   <dbl>   <dbl>
-#>  1            0   sd      Alanine Amino…  1597   299     3     1 0.00333 1.87e-3
-#>  2            0   sd      Alkaline Phos…  1567   298    33     2 0.00667 2.06e-2
-#>  3            0   average Alanine Amino…  1598   297     2     3 0.01    1.25e-3
-#>  4            0   average Alkaline Phos…  1563   298    37     2 0.00667 2.31e-2
-#>  5            0.5 sd      Alanine Amino…  1599   295     1     5 0.0167  6.25e-4
-#>  6            0.5 sd      Alkaline Phos…  1580   268    20    32 0.107   1.25e-2
-#>  7            0.5 average Alanine Amino…  1600   299     0     1 0.00333 0      
-#>  8            0.5 average Alkaline Phos…  1576   282    24    18 0.06    1.5 e-2
-#>  9            1   sd      Alanine Amino…  1600   282     0    18 0.06    0      
-#> 10            1   sd      Alkaline Phos…  1577   248    23    52 0.173   1.44e-2
-#> # ℹ 18 more rows
+#> # A tibble: 42 × 9
+#>    anomaly_degree feats    parameter_id     TN    FN    FP    TP     tpr     fpr
+#>             <dbl> <chr>    <chr>         <int> <int> <int> <int>   <dbl>   <dbl>
+#>  1            0   average  Alanine Amin…  1600   300     0     0 0       0      
+#>  2            0   average  Alkaline Pho…  1600   300     0     0 0       0      
+#>  3            0   sd       Alanine Amin…  1600   299     0     1 0.00333 0      
+#>  4            0   sd       Alkaline Pho…  1600   299     0     1 0.00333 0      
+#>  5            0   autocorr Alanine Amin…  1599   300     1     0 0       6.25e-4
+#>  6            0   autocorr Alkaline Pho…  1600   300     0     0 0       0      
+#>  7            0.1 average  Alanine Amin…  1600   299     0     1 0.00333 0      
+#>  8            0.1 average  Alkaline Pho…  1600   298     0     2 0.00667 0      
+#>  9            0.1 sd       Alanine Amin…  1600   289     0    11 0.0367  0      
+#> 10            0.1 sd       Alkaline Pho…  1543   121    57   179 0.597   3.56e-2
+#> # ℹ 32 more rows
 #> 
 #> $anomaly
-#> # A tibble: 954,674 × 38
-#>     iter anomaly_degree fun_anomaly feats STUDYID      DOMAIN subject_id   LBSEQ
-#>    <int>          <dbl> <list>      <chr> <chr>        <chr>  <chr>        <dbl>
-#>  1     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…     2
-#>  2     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…    39
-#>  3     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…    74
-#>  4     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…   104
-#>  5     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…   134
-#>  6     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…   164
-#>  7     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…   199
-#>  8     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…   231
-#>  9     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…   262
-#> 10     1              0 <fn>        sd    CDISCPILOT01 LB     sample_site…   299
-#> # ℹ 954,664 more rows
+#> # A tibble: 1,408,058 × 38
+#>     iter anomaly_degree fun_anomaly feats   STUDYID      DOMAIN subject_id LBSEQ
+#>    <int>          <dbl> <list>      <chr>   <chr>        <chr>  <chr>      <dbl>
+#>  1     1              0 <fn>        average CDISCPILOT01 LB     sample_si…     2
+#>  2     1              0 <fn>        average CDISCPILOT01 LB     sample_si…    39
+#>  3     1              0 <fn>        average CDISCPILOT01 LB     sample_si…    74
+#>  4     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   104
+#>  5     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   134
+#>  6     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   164
+#>  7     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   199
+#>  8     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   231
+#>  9     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   262
+#> 10     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   299
+#> # ℹ 1,408,048 more rows
 #> # ℹ 30 more variables: LBTESTCD <chr>, LBTEST <chr>, LBCAT <chr>,
 #> #   LBORRES <chr>, LBORRESU <chr>, LBORNRLO <chr>, LBORNRHI <chr>,
 #> #   LBSTRESC <chr>, LBSTRESN <dbl>, LBSTRESU <chr>, LBSTNRLO <dbl>,
@@ -117,36 +131,50 @@ ctas$result %>%
   knitr::kable(digits = 3)
 ```
 
-| anomaly_degree | feats   | parameter_id             |   TN |  FN |  FP |  TP |   tpr |   fpr |
-|---------------:|:--------|:-------------------------|-----:|----:|----:|----:|------:|------:|
-|            0.0 | sd      | Alanine Aminotransferase | 1597 | 299 |   3 |   1 | 0.003 | 0.002 |
-|            0.0 | sd      | Alkaline Phosphatase     | 1567 | 298 |  33 |   2 | 0.007 | 0.021 |
-|            0.0 | average | Alanine Aminotransferase | 1598 | 297 |   2 |   3 | 0.010 | 0.001 |
-|            0.0 | average | Alkaline Phosphatase     | 1563 | 298 |  37 |   2 | 0.007 | 0.023 |
-|            0.5 | sd      | Alanine Aminotransferase | 1599 | 295 |   1 |   5 | 0.017 | 0.001 |
-|            0.5 | sd      | Alkaline Phosphatase     | 1580 | 268 |  20 |  32 | 0.107 | 0.013 |
-|            0.5 | average | Alanine Aminotransferase | 1600 | 299 |   0 |   1 | 0.003 | 0.000 |
-|            0.5 | average | Alkaline Phosphatase     | 1576 | 282 |  24 |  18 | 0.060 | 0.015 |
-|            1.0 | sd      | Alanine Aminotransferase | 1600 | 282 |   0 |  18 | 0.060 | 0.000 |
-|            1.0 | sd      | Alkaline Phosphatase     | 1577 | 248 |  23 |  52 | 0.173 | 0.014 |
-|            1.0 | average | Alanine Aminotransferase | 1597 | 300 |   3 |   0 | 0.000 | 0.002 |
-|            1.0 | average | Alkaline Phosphatase     | 1576 | 280 |  24 |  20 | 0.067 | 0.015 |
-|            2.0 | sd      | Alanine Aminotransferase | 1600 | 268 |   0 |  32 | 0.107 | 0.000 |
-|            2.0 | sd      | Alkaline Phosphatase     | 1584 | 253 |  16 |  47 | 0.157 | 0.010 |
-|            2.0 | average | Alanine Aminotransferase | 1600 | 287 |   0 |  13 | 0.043 | 0.000 |
-|            2.0 | average | Alkaline Phosphatase     | 1581 | 266 |  19 |  34 | 0.113 | 0.012 |
-|            5.0 | sd      | Alanine Aminotransferase | 1600 | 260 |   0 |  40 | 0.133 | 0.000 |
-|            5.0 | sd      | Alkaline Phosphatase     | 1582 | 254 |  18 |  46 | 0.153 | 0.011 |
-|            5.0 | average | Alanine Aminotransferase | 1600 | 262 |   0 |  38 | 0.127 | 0.000 |
-|            5.0 | average | Alkaline Phosphatase     | 1583 | 262 |  17 |  38 | 0.127 | 0.011 |
-|           10.0 | sd      | Alanine Aminotransferase | 1600 | 265 |   0 |  35 | 0.117 | 0.000 |
-|           10.0 | sd      | Alkaline Phosphatase     | 1582 | 245 |  18 |  55 | 0.183 | 0.011 |
-|           10.0 | average | Alanine Aminotransferase | 1600 | 252 |   0 |  48 | 0.160 | 0.000 |
-|           10.0 | average | Alkaline Phosphatase     | 1576 | 243 |  24 |  57 | 0.190 | 0.015 |
-|           50.0 | sd      | Alanine Aminotransferase | 1600 | 274 |   0 |  26 | 0.087 | 0.000 |
-|           50.0 | sd      | Alkaline Phosphatase     | 1580 | 247 |  20 |  53 | 0.177 | 0.013 |
-|           50.0 | average | Alanine Aminotransferase | 1600 | 254 |   0 |  46 | 0.153 | 0.000 |
-|           50.0 | average | Alkaline Phosphatase     | 1582 | 234 |  18 |  66 | 0.220 | 0.011 |
+| anomaly_degree | feats    | parameter_id             |   TN |  FN |  FP |  TP |   tpr |   fpr |
+|---------------:|:---------|:-------------------------|-----:|----:|----:|----:|------:|------:|
+|           0.00 | average  | Alanine Aminotransferase | 1600 | 300 |   0 |   0 | 0.000 | 0.000 |
+|           0.00 | average  | Alkaline Phosphatase     | 1600 | 300 |   0 |   0 | 0.000 | 0.000 |
+|           0.00 | sd       | Alanine Aminotransferase | 1600 | 299 |   0 |   1 | 0.003 | 0.000 |
+|           0.00 | sd       | Alkaline Phosphatase     | 1600 | 299 |   0 |   1 | 0.003 | 0.000 |
+|           0.00 | autocorr | Alanine Aminotransferase | 1599 | 300 |   1 |   0 | 0.000 | 0.001 |
+|           0.00 | autocorr | Alkaline Phosphatase     | 1600 | 300 |   0 |   0 | 0.000 | 0.000 |
+|           0.10 | average  | Alanine Aminotransferase | 1600 | 299 |   0 |   1 | 0.003 | 0.000 |
+|           0.10 | average  | Alkaline Phosphatase     | 1600 | 298 |   0 |   2 | 0.007 | 0.000 |
+|           0.10 | sd       | Alanine Aminotransferase | 1600 | 289 |   0 |  11 | 0.037 | 0.000 |
+|           0.10 | sd       | Alkaline Phosphatase     | 1543 | 121 |  57 | 179 | 0.597 | 0.036 |
+|           0.10 | autocorr | Alanine Aminotransferase | 1595 | 298 |   5 |   2 | 0.007 | 0.003 |
+|           0.10 | autocorr | Alkaline Phosphatase     | 1600 | 264 |   0 |  36 | 0.120 | 0.000 |
+|           0.25 | average  | Alanine Aminotransferase | 1600 | 241 |   0 |  59 | 0.197 | 0.000 |
+|           0.25 | average  | Alkaline Phosphatase     | 1599 | 200 |   1 | 100 | 0.333 | 0.001 |
+|           0.25 | sd       | Alanine Aminotransferase | 1526 | 120 |  74 | 180 | 0.600 | 0.046 |
+|           0.25 | sd       | Alkaline Phosphatase     | 1382 |  25 | 218 | 275 | 0.917 | 0.136 |
+|           0.25 | autocorr | Alanine Aminotransferase | 1579 | 209 |  21 |  91 | 0.303 | 0.013 |
+|           0.25 | autocorr | Alkaline Phosphatase     | 1600 | 106 |   0 | 194 | 0.647 | 0.000 |
+|           0.50 | average  | Alanine Aminotransferase | 1561 | 111 |  39 | 189 | 0.630 | 0.024 |
+|           0.50 | average  | Alkaline Phosphatase     | 1583 |  69 |  17 | 231 | 0.770 | 0.011 |
+|           0.50 | sd       | Alanine Aminotransferase | 1429 |  28 | 171 | 272 | 0.907 | 0.107 |
+|           0.50 | sd       | Alkaline Phosphatase     | 1376 |   7 | 224 | 293 | 0.977 | 0.140 |
+|           0.50 | autocorr | Alanine Aminotransferase | 1422 |  83 | 178 | 217 | 0.723 | 0.111 |
+|           0.50 | autocorr | Alkaline Phosphatase     | 1600 |  57 |   0 | 243 | 0.810 | 0.000 |
+|           1.00 | average  | Alanine Aminotransferase | 1460 |  37 | 140 | 263 | 0.877 | 0.088 |
+|           1.00 | average  | Alkaline Phosphatase     | 1515 |  29 |  85 | 271 | 0.903 | 0.053 |
+|           1.00 | sd       | Alanine Aminotransferase | 1411 |  12 | 189 | 288 | 0.960 | 0.118 |
+|           1.00 | sd       | Alkaline Phosphatase     | 1373 |   3 | 227 | 297 | 0.990 | 0.142 |
+|           1.00 | autocorr | Alanine Aminotransferase | 1386 |  56 | 214 | 244 | 0.813 | 0.134 |
+|           1.00 | autocorr | Alkaline Phosphatase     | 1600 |  42 |   0 | 258 | 0.860 | 0.000 |
+|           2.00 | average  | Alanine Aminotransferase | 1436 |   8 | 164 | 292 | 0.973 | 0.102 |
+|           2.00 | average  | Alkaline Phosphatase     | 1473 |   8 | 127 | 292 | 0.973 | 0.079 |
+|           2.00 | sd       | Alanine Aminotransferase | 1417 |  11 | 183 | 289 | 0.963 | 0.114 |
+|           2.00 | sd       | Alkaline Phosphatase     | 1388 |  10 | 212 | 290 | 0.967 | 0.132 |
+|           2.00 | autocorr | Alanine Aminotransferase | 1369 |  46 | 231 | 254 | 0.847 | 0.144 |
+|           2.00 | autocorr | Alkaline Phosphatase     | 1598 |  35 |   2 | 265 | 0.883 | 0.001 |
+|           5.00 | average  | Alanine Aminotransferase | 1410 |   5 | 190 | 295 | 0.983 | 0.119 |
+|           5.00 | average  | Alkaline Phosphatase     | 1437 |   1 | 163 | 299 | 0.997 | 0.102 |
+|           5.00 | sd       | Alanine Aminotransferase | 1389 |   1 | 211 | 299 | 0.997 | 0.132 |
+|           5.00 | sd       | Alkaline Phosphatase     | 1367 |   6 | 233 | 294 | 0.980 | 0.146 |
+|           5.00 | autocorr | Alanine Aminotransferase | 1358 |  29 | 242 | 271 | 0.903 | 0.151 |
+|           5.00 | autocorr | Alkaline Phosphatase     | 1600 |  36 |   0 | 264 | 0.880 | 0.000 |
 
 ### Anamolous Sites
 
@@ -170,55 +198,55 @@ ctas$anomaly %>%
   knitr::kable()
 ```
 
-| iter | anomaly_degree | feats   | parameter_id             | site         | subject_id               | timepoint_rank |    result | score |
-|-----:|---------------:|:--------|:-------------------------|:-------------|:-------------------------|---------------:|----------:|------:|
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1033 |            1.0 | 1099.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1033 |            4.0 | 1118.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1033 |            5.0 | 1097.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1180 |            1.0 | 1241.5000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1180 |            4.0 | 1241.5000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1180 |            5.0 | 1232.5000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1180 |            7.0 | 1231.5000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1188 |            1.0 | 1171.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1188 |            4.0 | 1179.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1188 |            5.0 | 1173.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1188 |            7.0 | 1169.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |            1.0 |  402.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |            4.0 |  402.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |            5.0 |  401.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |            7.0 |  402.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |            8.0 |  402.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |            9.0 |  408.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |           10.0 |  404.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |           11.0 |  405.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |           12.0 |  402.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-704-1164 |           13.0 |  401.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |            1.2 |  598.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |            4.0 |  595.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |            5.0 |  592.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |            7.0 |  588.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |            8.0 |  594.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |           10.0 |  595.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |           11.0 |  597.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |           12.0 |  597.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-708-1348 |           13.0 |  596.3333 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |            1.0 | 1225.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |            4.0 | 1227.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |            5.0 | 1226.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |            7.0 | 1231.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |            8.0 | 1227.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |            9.0 | 1225.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |           10.0 | 1227.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |           11.0 | 1218.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |           12.0 | 1217.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-709-1339 |           13.0 | 1217.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1070 |            1.0 |  586.5714 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1070 |            4.0 |  589.5714 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1070 |            5.0 |  591.5714 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1070 |            7.0 |  592.5714 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1070 |            8.0 |  590.5714 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1070 |            9.0 |  589.5714 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1070 |           10.0 |  590.5714 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1354 |            1.0 | 1669.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1354 |            4.0 | 1667.0000 |     0 |
-|    1 |             50 | average | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1354 |            5.0 | 1665.0000 |     0 |
+| iter | anomaly_degree | feats    | parameter_id             | site         | subject_id               | timepoint_rank |      result |    score |
+|-----:|---------------:|:---------|:-------------------------|:-------------|:-------------------------|---------------:|------------:|---------:|
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1111 |              1 |  98.7633251 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1111 |              4 | 100.8701985 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1115 |              1 |  30.7059890 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1115 |              4 | -53.1400482 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1115 |              5 | -73.3384393 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1115 |              7 |  -7.1576675 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1115 |              8 |  75.1529478 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1146 |              1 | 104.0786157 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1146 |              4 |  51.1058151 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1146 |              5 | -32.9819008 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1146 |              7 | -77.0358829 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1188 |              1 | -27.3112896 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1188 |              4 |  66.8304806 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1188 |              5 | 112.1910814 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1188 |              7 |  77.5498133 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1211 |              1 |  -6.9218832 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1211 |              4 | -67.5611198 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1211 |              5 | -53.6164620 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1211 |              7 |  28.4944591 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1211 |              8 | 103.1986367 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |              1 |  84.3297669 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |              4 |  10.2030567 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |              5 | -67.1909474 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |              7 | -69.5353459 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |              8 |  -0.9165234 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |              9 |  81.6582958 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |             10 | 100.1089944 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |             11 |  38.3914807 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |             12 | -51.7514479 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1363 |             13 | -77.9591709 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1444 |              1 | -17.3782424 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1444 |              4 |  67.6486744 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1444 |              5 | 107.0288289 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-701-1444 |              7 |  70.6368933 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1086 |              1 | -18.5521823 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1086 |              4 | -60.2965593 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1086 |              5 | -40.9420915 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1086 |              7 |  39.6840680 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1086 |              8 | 102.7770184 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1086 |              9 |  79.0875783 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1086 |             10 |  10.7181281 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1279 |              1 | -71.5206350 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1379 |              1 | -65.8903068 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1379 |              4 |   6.5938241 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1379 |              5 |  83.6126004 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1379 |              7 |  87.1941053 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1379 |              8 |  17.1261242 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1379 |              9 | -59.1711642 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1379 |             10 | -79.8728032 | 12.03571 |
+|    1 |              5 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1379 |             11 |   0.3766170 | 12.03571 |
