@@ -127,7 +127,7 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df_prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="prep_sdtm_lb.html">prep_sdtm_lb</a></span><span class="op">(</span><span class="fu">pharmaversesdtm</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/pharmaversesdtm/man/lb.html" class="external-link">lb</a></span>, <span class="fu">pharmaversesdtm</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/pkg/pharmaversesdtm/man/dm.html" class="external-link">dm</a></span>, scramble <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">df_prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="prep_sdtm_lb.html">prep_sdtm_lb</a></span><span class="op">(</span><span class="fu">pharmaversesdtm</span><span class="fu">::</span><span class="va"><a href="https://pharmaverse.github.io/pharmaversesdtm/reference/lb.html" class="external-link">lb</a></span>, <span class="fu">pharmaversesdtm</span><span class="fu">::</span><span class="va"><a href="https://pharmaverse.github.io/pharmaversesdtm/reference/dm.html" class="external-link">dm</a></span>, scramble <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">df_filt</span> <span class="op">&lt;-</span> <span class="va">df_prep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">parameter_id</span> <span class="op">==</span> <span class="st">"Alkaline Phosphatase"</span><span class="op">)</span></span></span>
@@ -153,13 +153,13 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>            1   sd      Alkaline Phosphat…    17     3     0     0 0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>            5   average Alkaline Phosphat…    17     3     0     0 0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>            5   sd      Alkaline Phosphat…    17     3     0     0 0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>           10   average Alkaline Phosphat…    17     2     0     1 0.333     0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>           10   sd      Alkaline Phosphat…    17     3     0     0 0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>           10   average Alkaline Phosphat…    17     3     0     0 0         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>           10   sd      Alkaline Phosphat…    17     2     0     1 0.333     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">11</span>           50   average Alkaline Phosphat…    17     3     0     0 0         0</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>           50   sd      Alkaline Phosphat…    17     2     0     1 0.333     0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>           50   sd      Alkaline Phosphat…    17     3     0     0 0         0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $anomaly</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3,358 × 38</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 4,121 × 38</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>     iter anomaly_degree fun_anomaly feats   STUDYID      DOMAIN subject_id LBSEQ</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…     2</span>
@@ -169,10 +169,10 @@
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   134</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   164</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   199</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   229</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   259</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3,348 more rows</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   231</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   262</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   299</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 4,111 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 30 more variables: LBTESTCD &lt;chr&gt;, LBTEST &lt;chr&gt;, LBCAT &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBORRES &lt;chr&gt;, LBORRESU &lt;chr&gt;, LBORNRLO &lt;chr&gt;, LBORNRHI &lt;chr&gt;,</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBSTRESC &lt;chr&gt;, LBSTRESN &lt;dbl&gt;, LBSTRESU &lt;chr&gt;, LBSTNRLO &lt;dbl&gt;,</span></span>
