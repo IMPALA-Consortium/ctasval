@@ -45,6 +45,7 @@ library(pharmaversesdtm)
 library(dplyr)
 library(future)
 library(ctasval)
+library(stringr)
 
 
 set.seed(1)
@@ -52,18 +53,19 @@ set.seed(1)
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
 df_filt <- df_prep %>%
-  filter(parameter_id %in% c("Alkaline Phosphatase", "Alanine Aminotransferase"))
+  filter(parameter_id %in% c("Alkaline Phosphatase", "Alanine Aminotransferase")) %>%
+  filter(! grepl("UNSCH", VISIT))
 
 plan(multisession, workers = 6)
 
 ctas <- ctasval(
   df = df_filt,
-  fun_anomaly = c(anomaly_average, anomaly_sd),
-  feats = c("average", "sd"),
+  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr),
+  feats = c("average", "sd", "autocorr"),
   parallel = TRUE,
   iter = 100,
   n_sites = 3,
-  anomaly_degree = c(0, 0.5, 1, 2, 10, 50),
+  anomaly_degree = c(0, 0.1, 0.25, 0.5, 1, 2, 5),
   thresh = 1
 )
 
