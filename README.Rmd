@@ -45,6 +45,8 @@ library(pharmaversesdtm)
 library(dplyr)
 library(future)
 library(ctasval)
+library(ggplot2)
+library(tidyr)
 
 
 
@@ -60,8 +62,8 @@ plan(multisession, workers = 6)
 
 ctas <- ctasval(
   df = df_filt,
-  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr, anomaly_lof),
-  feats = c("average", "sd", "autocorr", "lof"),
+  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr, anomaly_lof, anomaly_range),
+  feats = c("average", "sd", "autocorr", "lof", "range"),
   parallel = TRUE,
   iter = 100,
   n_sites = 3,
@@ -78,7 +80,12 @@ ctas
 
 ```{r}
 ctas$result %>%
-  knitr::kable(digits = 3)
+  tidyr::pivot_longer(c(tpr, fpr), values_to = "metric", names_to = "metric_type") %>%
+  ggplot(aes(log(anomaly_degree),  metric)) +
+  geom_line(aes(linetype = metric_type)) +
+  geom_point() +
+  facet_grid(parameter_id ~ feats) +
+  theme(legend.position = "bottom")
 ```
 
 ### Anamolous Sites
