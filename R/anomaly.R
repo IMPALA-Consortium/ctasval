@@ -163,6 +163,58 @@ anomaly_lof <- function(df, anomaly_degree, site = "sample_site", verbose = FALS
   return(sample_data)
 }
 
+
+#' Range
+#'
+#' @rdname anomaly
+#' @export
+#' @examples
+#' set.seed(7)
+#' library(ggplot2)
+#'
+#' df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
+#'
+#' df_filt <- df_prep %>%
+#'   filter(parameter_id == "Alkaline Phosphatase")
+#'
+#'df_anomaly <- anomaly_range(df_filt, anomaly_degree = 2, site = "anomolous")
+#'
+#'ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
+#' geom_line(color = "black") +
+#' geom_line(data = df_anomaly, color = "tomato") +
+#' coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
+#'
+anomaly_range <- function(df, anomaly_degree, site = "sample_site") {
+
+  sample_data <- sample_site(df, site)
+
+  df_outlier <- sample_data %>%
+    group_by(.data$subject_id) %>%
+    sample_n(1) %>%
+    ungroup() %>%
+    select("subject_id", "timepoint_rank") %>%
+    mutate(add_outlier = TRUE)
+
+
+  sample_data <- sample_data %>%
+    left_join(
+      df_outlier,
+      by = c("subject_id", "timepoint_rank")
+    ) %>%
+    mutate(
+      add_outlier = ifelse(is.na(.data$add_outlier), FALSE, .data$add_outlier),
+      result = ifelse(
+        .data$add_outlier,
+        .data$result + mean(.data$result, na.rm = TRUE) * .env$anomaly_degree,
+        .data$result),
+      method = "range",
+      .by = c("parameter_id")
+    )
+
+  return(sample_data)
+}
+
+
 #' sample values from a randomly selected non-normal distribution
 #' @export
 #' @param n integer, number of values

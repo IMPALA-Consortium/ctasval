@@ -5,6 +5,7 @@
 \alias{anomaly_sd}
 \alias{anomaly_autocorr}
 \alias{anomaly_lof}
+\alias{anomaly_range}
 \title{Create site with anomalous patients}
 \usage{
 anomaly_average(df, anomaly_degree, site = "sample_site")
@@ -14,6 +15,8 @@ anomaly_sd(df, anomaly_degree, site = "sample_site")
 anomaly_autocorr(df, anomaly_degree, site = "sample_site")
 
 anomaly_lof(df, anomaly_degree, site = "sample_site", verbose = FALSE)
+
+anomaly_range(df, anomaly_degree, site = "sample_site")
 }
 \arguments{
 \item{df}{Data frame containing the study data.}
@@ -91,6 +94,21 @@ geom_line(color = "black") +
 geom_line(data = df_anomaly, color = "tomato") +
 coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
 
+
+set.seed(7)
+library(ggplot2)
+
+df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
+
+df_filt <- df_prep \%>\%
+  filter(parameter_id == "Alkaline Phosphatase")
+
+df_anomaly <- anomaly_range(df_filt, anomaly_degree = 2, site = "anomolous")
+
+ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
+geom_line(color = "black") +
+geom_line(data = df_anomaly, color = "tomato") +
+coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
 
 }
 \seealso{
