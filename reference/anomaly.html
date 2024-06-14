@@ -48,7 +48,9 @@
 <span></span>
 <span><span class="fu">anomaly_autocorr</span><span class="op">(</span><span class="va">df</span>, <span class="va">anomaly_degree</span>, site <span class="op">=</span> <span class="st">"sample_site"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu">anomaly_lof</span><span class="op">(</span><span class="va">df</span>, <span class="va">anomaly_degree</span>, site <span class="op">=</span> <span class="st">"sample_site"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">anomaly_lof</span><span class="op">(</span><span class="va">df</span>, <span class="va">anomaly_degree</span>, site <span class="op">=</span> <span class="st">"sample_site"</span>, verbose <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">anomaly_range</span><span class="op">(</span><span class="va">df</span>, <span class="va">anomaly_degree</span>, site <span class="op">=</span> <span class="st">"sample_site"</span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div class="section level2">
@@ -190,6 +192,22 @@
 <span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">df_anomaly</span><span class="op">$</span><span class="va">timepoint_rank</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="anomaly-4.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">7</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">df_prep</span> <span class="op">&lt;-</span> <span class="fu"><a href="prep_sdtm_lb.html">prep_sdtm_lb</a></span><span class="op">(</span><span class="fu">pharmaversesdtm</span><span class="fu">::</span><span class="va"><a href="https://pharmaverse.github.io/pharmaversesdtm/reference/lb.html" class="external-link">lb</a></span>, <span class="fu">pharmaversesdtm</span><span class="fu">::</span><span class="va"><a href="https://pharmaverse.github.io/pharmaversesdtm/reference/dm.html" class="external-link">dm</a></span>, scramble <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">df_filt</span> <span class="op">&lt;-</span> <span class="va">df_prep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">parameter_id</span> <span class="op">==</span> <span class="st">"Alkaline Phosphatase"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="va">df_anomaly</span> <span class="op">&lt;-</span> <span class="fu">anomaly_range</span><span class="op">(</span><span class="va">df_filt</span>, anomaly_degree <span class="op">=</span> <span class="fl">2</span>, site <span class="op">=</span> <span class="st">"anomolous"</span><span class="op">)</span></span></span>
+<span class="r-in"><span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">df_filt</span>, <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span> <span class="va">timepoint_rank</span>, y <span class="op">=</span> <span class="va">result</span>, group <span class="op">=</span> <span class="va">subject_id</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_path.html" class="external-link">geom_line</a></span><span class="op">(</span>data <span class="op">=</span> <span class="va">df_anomaly</span>, color <span class="op">=</span> <span class="st">"tomato"</span><span class="op">)</span> <span class="op">+</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_cartesian.html" class="external-link">coord_cartesian</a></span><span class="op">(</span>xlim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>, <span class="fu"><a href="https://rdrr.io/r/base/Extremes.html" class="external-link">max</a></span><span class="op">(</span><span class="va">df_anomaly</span><span class="op">$</span><span class="va">timepoint_rank</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="anomaly-5.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 </code></pre></div>
     </div>
