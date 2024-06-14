@@ -4,6 +4,7 @@
 #' @importFrom purrr map pmap
 #' @importFrom furrr future_map furrr_options
 #' @importFrom rlang .env .data
+#' @importFrom stats runif
 #' @import dplyr
 
 NULL

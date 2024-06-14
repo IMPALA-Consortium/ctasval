@@ -45,7 +45,7 @@ library(pharmaversesdtm)
 library(dplyr)
 library(future)
 library(ctasval)
-library(stringr)
+
 
 
 set.seed(1)
@@ -60,12 +60,12 @@ plan(multisession, workers = 6)
 
 ctas <- ctasval(
   df = df_filt,
-  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr),
-  feats = c("average", "sd", "autocorr"),
+  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr, anomaly_lof),
+  feats = c("average", "sd", "autocorr", "lof"),
   parallel = TRUE,
   iter = 100,
   n_sites = 3,
-  anomaly_degree = c(0, 0.1, 0.25, 0.5, 1, 2, 5),
+  anomaly_degree = c(0, 0.1, 0.25, 0.5, 1, 2, 5, 100),
   thresh = 1
 )
 

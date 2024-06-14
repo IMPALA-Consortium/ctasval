@@ -16,6 +16,10 @@ reference:
     contents:
       - prep_sdtm_lb
       - prep_sdtm_vs
+  - title: Helpers
+    desc: ~
+    contents:
+      - rsurprise
 
 navbar:
   structure:
