@@ -18,7 +18,9 @@ knitr::opts_chunk$set(
 # ctasval
 
 <!-- badges: start -->
+
 [![R-CMD-check](https://github.com/IMPALA-Consortium/ctasval/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/IMPALA-Consortium/ctasval/actions/workflows/R-CMD-check.yaml)
+
 <!-- badges: end -->
 
 The goal of ctasval is to provide structured code to validate {ctas} performance on study data.
@@ -35,9 +37,7 @@ devtools::install_github("IMPALA-Consortium/ctasval")
 
 ## ctasval
 
-`ctasval` adds three anomalous sites to the data set for each iteration and tries to detect them using {ctas}.
-It samples from the study site pool to first determine the number of patients and then samples a sufficient
-number of patients from the study patient pool.
+`ctasval` adds three anomalous sites to the data set for each iteration and tries to detect them using {ctas}. It samples from the study site pool to first determine the number of patients and then samples a sufficient number of patients from the study patient pool.
 
 ```{r}
 
@@ -56,14 +56,14 @@ df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRU
 
 df_filt <- df_prep %>%
   filter(parameter_id %in% c("Alkaline Phosphatase", "Alanine Aminotransferase")) %>%
-  filter(! grepl("UNSCH", VISIT))
+  filter(! grepl("UNSCH", VISIT) & !VISIT %in% c("AMBUL ECG REMOVAL", "RETRIEVAL"))
 
 plan(multisession, workers = 6)
 
 ctas <- ctasval(
   df = df_filt,
-  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr, anomaly_lof, anomaly_range),
-  feats = c("average", "sd", "autocorr", "lof", "range"),
+  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr, anomaly_lof, anomaly_range, anomaly_unique_value_count_relative),
+  feats = c("average", "sd", "autocorr", "lof", "range", "unique_value_count_relative"),
   parallel = TRUE,
   iter = 100,
   n_sites = 3,

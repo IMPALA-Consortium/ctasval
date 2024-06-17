@@ -270,3 +270,48 @@ rsurprise <- function(n, verbose = FALSE) {
   return(data)
 }
 
+#' unique_value_count_relative
+#'
+#' @rdname anomaly
+#' @export
+#' @examples
+#' set.seed(1)
+#' library(ggplot2)
+#'
+#' df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
+#'
+#' df_filt <- df_prep %>%
+#'   filter(parameter_id == "Alkaline Phosphatase")
+#'
+#'df_anomaly <- anomaly_sd(df_filt, anomaly_degree = 2, site = "anomolous")
+#'
+#'ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
+#' geom_line(color = "black") +
+#' geom_line(data = df_anomaly, color = "tomato") +
+#' coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
+#'
+anomaly_unique_value_count_relative <- function(df, anomaly_degree, site = "sample_site") {
+  
+  # Converts the anomaly_degree to the probability that a result is replaces with the first value of the time series
+  anomaly_degree_to_prop <- function(x) {
+    
+    y = ifelse(x == 0, 0, 1 / (1 + exp(-1 * (x - 2.5))))
+    return(y)
+    
+  }
+  
+  sample_data <- sample_site(df, site) %>%
+    mutate(
+      first_timepoint_result = first(.data$result, order_by=.data$timepoint_rank),
+      .by = c("parameter_id", "subject_id")
+    ) %>%
+    rowwise() %>%
+    mutate(
+      result = ifelse(runif(1) < anomaly_degree_to_prop(.env$anomaly_degree), .data$first_timepoint_result, .data$result),
+      method = "unique_value_count_relative"
+    ) %>%
+    select(-.data$first_timepoint_result)
+  
+  
+  return(sample_data)
+}

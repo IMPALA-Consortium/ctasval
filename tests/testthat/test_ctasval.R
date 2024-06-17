@@ -63,6 +63,15 @@ test_that("anomaly_range works correctly", {
   expect_equal(result$method[1], "range")
 })
 
+test_that("anomaly_unique_value_count works correctly", {
+  df_prep <- prep_sdtm_lb(lb, dm, scramble = TRUE)
+  anomaly_degree <- 0.5
+  result <- anomaly_unique_value_count_relative(df_prep, anomaly_degree)
+  
+  expect_true("method" %in% names(result))
+  expect_equal(result$method[1], "unique_value_count_relative")
+})
+
 test_that("ctasval works correctly", {
   df_prep <- prep_sdtm_lb(lb, dm, scramble = TRUE)
 
