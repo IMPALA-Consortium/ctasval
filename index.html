@@ -55,6 +55,7 @@
 </h1></div>
 <!-- badges: start -->
 
+<!-- badges: end -->
 <p>The goal of ctasval is to provide structured code to validate {ctas} performance on study data.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -94,14 +95,14 @@
 <span></span>
 <span><span class="va">df_filt</span> <span class="op">&lt;-</span> <span class="va">df_prep</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">parameter_id</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Alkaline Phosphatase"</span>, <span class="st">"Alanine Aminotransferase"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"UNSCH"</span>, <span class="va">VISIT</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="op">!</span> <span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"UNSCH"</span>, <span class="va">VISIT</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">!</span><span class="va">VISIT</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"AMBUL ECG REMOVAL"</span>, <span class="st">"RETRIEVAL"</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">multisession</span>, workers <span class="op">=</span> <span class="fl">6</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/ctasval.html">ctasval</a></span><span class="op">(</span></span>
 <span>  df <span class="op">=</span> <span class="va">df_filt</span>,</span>
-<span>  fun_anomaly <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">anomaly_average</span>, <span class="va">anomaly_sd</span>, <span class="va">anomaly_autocorr</span>, <span class="va">anomaly_lof</span>, <span class="va">anomaly_range</span><span class="op">)</span>,</span>
-<span>  feats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"average"</span>, <span class="st">"sd"</span>, <span class="st">"autocorr"</span>, <span class="st">"lof"</span>, <span class="st">"range"</span><span class="op">)</span>,</span>
+<span>  fun_anomaly <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">anomaly_average</span>, <span class="va">anomaly_sd</span>, <span class="va">anomaly_autocorr</span>, <span class="va">anomaly_lof</span>, <span class="va">anomaly_range</span>, <span class="va">anomaly_unique_value_count_relative</span><span class="op">)</span>,</span>
+<span>  feats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"average"</span>, <span class="st">"sd"</span>, <span class="st">"autocorr"</span>, <span class="st">"lof"</span>, <span class="st">"range"</span>, <span class="st">"unique_value_count_relative"</span><span class="op">)</span>,</span>
 <span>  parallel <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  iter <span class="op">=</span> <span class="fl">100</span>,</span>
 <span>  n_sites <span class="op">=</span> <span class="fl">3</span>,</span>
@@ -112,36 +113,36 @@
 <span><span class="co">#&gt; The first warning was:</span></span>
 <span><span class="co">#&gt; ℹ In argument: `ctas = simaerep::purrr_bar(...)`.</span></span>
 <span><span class="co">#&gt; Caused by warning:</span></span>
-<span><span class="co">#&gt; ! There were 7 warnings in `mutate()`.</span></span>
+<span><span class="co">#&gt; ! There were 13 warnings in `mutate()`.</span></span>
 <span><span class="co">#&gt; The first warning was:</span></span>
 <span><span class="co">#&gt; ℹ In argument: `ts_features = list(...)`.</span></span>
 <span><span class="co">#&gt; ℹ In row 2.</span></span>
 <span><span class="co">#&gt; Caused by warning in `cor()`:</span></span>
 <span><span class="co">#&gt; ! the standard deviation is zero</span></span>
-<span><span class="co">#&gt; ℹ Run `dplyr::last_dplyr_warnings()` to see the 6 remaining warnings.</span></span>
+<span><span class="co">#&gt; ℹ Run `dplyr::last_dplyr_warnings()` to see the 12 remaining warnings.</span></span>
 <span><span class="co">#&gt; ℹ Run `dplyr::last_dplyr_warnings()` to see the 799 remaining warnings.</span></span>
 <span></span>
 <span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">sequential</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas</span></span>
 <span><span class="co">#&gt; $result</span></span>
-<span><span class="co">#&gt; # A tibble: 80 × 9</span></span>
+<span><span class="co">#&gt; # A tibble: 96 × 9</span></span>
 <span><span class="co">#&gt;    anomaly_degree feats    parameter_id       TN    FN    FP    TP     tpr   fpr</span></span>
 <span><span class="co">#&gt;             &lt;dbl&gt; &lt;chr&gt;    &lt;chr&gt;           &lt;int&gt; &lt;int&gt; &lt;int&gt; &lt;int&gt;   &lt;dbl&gt; &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt;  1              0 average  Alanine Aminot…  1600   299     0     1 0.00333     0</span></span>
 <span><span class="co">#&gt;  2              0 average  Alkaline Phosp…  1600   300     0     0 0           0</span></span>
-<span><span class="co">#&gt;  3              0 sd       Alanine Aminot…  1600   299     0     1 0.00333     0</span></span>
-<span><span class="co">#&gt;  4              0 sd       Alkaline Phosp…  1600   300     0     0 0           0</span></span>
+<span><span class="co">#&gt;  3              0 sd       Alanine Aminot…  1600   300     0     0 0           0</span></span>
+<span><span class="co">#&gt;  4              0 sd       Alkaline Phosp…  1600   299     0     1 0.00333     0</span></span>
 <span><span class="co">#&gt;  5              0 autocorr Alanine Aminot…  1600   299     0     1 0.00333     0</span></span>
 <span><span class="co">#&gt;  6              0 autocorr Alkaline Phosp…  1600   300     0     0 0           0</span></span>
-<span><span class="co">#&gt;  7              0 lof      Alanine Aminot…  1600   299     0     1 0.00333     0</span></span>
-<span><span class="co">#&gt;  8              0 lof      Alkaline Phosp…  1600   300     0     0 0           0</span></span>
+<span><span class="co">#&gt;  7              0 lof      Alanine Aminot…  1600   300     0     0 0           0</span></span>
+<span><span class="co">#&gt;  8              0 lof      Alkaline Phosp…  1600   299     0     1 0.00333     0</span></span>
 <span><span class="co">#&gt;  9              0 range    Alanine Aminot…  1600   300     0     0 0           0</span></span>
-<span><span class="co">#&gt; 10              0 range    Alkaline Phosp…  1600   299     0     1 0.00333     0</span></span>
-<span><span class="co">#&gt; # ℹ 70 more rows</span></span>
+<span><span class="co">#&gt; 10              0 range    Alkaline Phosp…  1600   300     0     0 0           0</span></span>
+<span><span class="co">#&gt; # ℹ 86 more rows</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; $anomaly</span></span>
-<span><span class="co">#&gt; # A tibble: 2,672,132 × 39</span></span>
+<span><span class="co">#&gt; # A tibble: 3,188,246 × 39</span></span>
 <span><span class="co">#&gt;     iter anomaly_degree fun_anomaly feats   STUDYID      DOMAIN subject_id LBSEQ</span></span>
 <span><span class="co">#&gt;    &lt;int&gt;          &lt;dbl&gt; &lt;list&gt;      &lt;chr&gt;   &lt;chr&gt;        &lt;chr&gt;  &lt;chr&gt;      &lt;dbl&gt;</span></span>
 <span><span class="co">#&gt;  1     1              0 &lt;fn&gt;        average CDISCPILOT01 LB     sample_si…     2</span></span>
@@ -154,7 +155,7 @@
 <span><span class="co">#&gt;  8     1              0 &lt;fn&gt;        average CDISCPILOT01 LB     sample_si…   231</span></span>
 <span><span class="co">#&gt;  9     1              0 &lt;fn&gt;        average CDISCPILOT01 LB     sample_si…   262</span></span>
 <span><span class="co">#&gt; 10     1              0 &lt;fn&gt;        average CDISCPILOT01 LB     sample_si…   299</span></span>
-<span><span class="co">#&gt; # ℹ 2,672,122 more rows</span></span>
+<span><span class="co">#&gt; # ℹ 3,188,236 more rows</span></span>
 <span><span class="co">#&gt; # ℹ 31 more variables: LBTESTCD &lt;chr&gt;, LBTEST &lt;chr&gt;, LBCAT &lt;chr&gt;,</span></span>
 <span><span class="co">#&gt; #   LBORRES &lt;chr&gt;, LBORRESU &lt;chr&gt;, LBORNRLO &lt;chr&gt;, LBORNRHI &lt;chr&gt;,</span></span>
 <span><span class="co">#&gt; #   LBSTRESC &lt;chr&gt;, LBSTRESN &lt;dbl&gt;, LBSTRESU &lt;chr&gt;, LBSTNRLO &lt;dbl&gt;,</span></span>
@@ -227,10 +228,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-705-1281</td>
+<td align="left">sample_site1-01-701-1211</td>
 <td align="right">1</td>
-<td align="right">1069.6635991</td>
-<td align="right">1.209217</td>
+<td align="right">1329.591059</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
@@ -238,10 +239,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-705-1281</td>
+<td align="left">sample_site1-01-701-1211</td>
 <td align="right">4</td>
-<td align="right">1158.7549537</td>
-<td align="right">1.209217</td>
+<td align="right">1435.230742</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
@@ -249,10 +250,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-705-1281</td>
+<td align="left">sample_site1-01-701-1211</td>
 <td align="right">5</td>
-<td align="right">188.0414647</td>
-<td align="right">1.209217</td>
+<td align="right">233.794413</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
@@ -260,10 +261,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-705-1281</td>
+<td align="left">sample_site1-01-701-1211</td>
 <td align="right">7</td>
-<td align="right">-939.4431305</td>
-<td align="right">1.209217</td>
+<td align="right">-1163.719886</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
@@ -271,10 +272,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-705-1281</td>
+<td align="left">sample_site1-01-701-1211</td>
 <td align="right">8</td>
-<td align="right">-1191.0140900</td>
-<td align="right">1.209217</td>
+<td align="right">-1472.524558</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
@@ -282,10 +283,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-705-1281</td>
-<td align="right">9</td>
-<td align="right">-341.5394432</td>
-<td align="right">1.209217</td>
+<td align="left">sample_site1-01-701-1317</td>
+<td align="right">1</td>
+<td align="right">-426.189638</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
@@ -293,21 +294,65 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-705-1281</td>
+<td align="left">sample_site1-01-701-1317</td>
+<td align="right">4</td>
+<td align="right">1036.256627</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-701-1317</td>
+<td align="right">5</td>
+<td align="right">1549.925469</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-701-1317</td>
+<td align="right">7</td>
+<td align="right">649.874541</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-701-1317</td>
+<td align="right">8</td>
+<td align="right">-836.312880</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-701-1317</td>
+<td align="right">9</td>
+<td align="right">-1548.484747</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-701-1317</td>
 <td align="right">10</td>
-<td align="right">836.2195511</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-708-1178</td>
-<td align="right">1</td>
-<td align="right">1249.1948912</td>
-<td align="right">1.209217</td>
+<td align="right">-824.712320</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
@@ -315,142 +360,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-708-1178</td>
-<td align="right">4</td>
-<td align="right">526.0213724</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-708-1178</td>
-<td align="right">5</td>
-<td align="right">-668.4992118</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-708-1178</td>
-<td align="right">7</td>
-<td align="right">-1240.5331682</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-708-1178</td>
-<td align="right">8</td>
-<td align="right">-662.1551153</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-708-1178</td>
-<td align="right">9</td>
-<td align="right">544.1186462</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
-<td align="right">1</td>
-<td align="right">1257.7619553</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
-<td align="right">4</td>
-<td align="right">827.8156540</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
-<td align="right">5</td>
-<td align="right">-341.1877973</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
-<td align="right">7</td>
-<td align="right">-1190.1168534</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
-<td align="right">8</td>
-<td align="right">-928.1476369</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
-<td align="right">9</td>
-<td align="right">204.0277721</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
-<td align="right">10</td>
-<td align="right">1165.3313145</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
+<td align="left">sample_site1-01-701-1317</td>
 <td align="right">11</td>
-<td align="right">1062.6225283</td>
-<td align="right">1.209217</td>
+<td align="right">665.410160</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
@@ -458,10 +371,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
+<td align="left">sample_site1-01-701-1317</td>
 <td align="right">12</td>
-<td align="right">-0.1043698</td>
-<td align="right">1.209217</td>
+<td align="right">1552.870956</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
@@ -469,10 +382,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-709-1088</td>
+<td align="left">sample_site1-01-701-1317</td>
 <td align="right">13</td>
-<td align="right">-1051.6219616</td>
-<td align="right">1.209217</td>
+<td align="right">1026.823311</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
@@ -480,10 +393,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
+<td align="left">sample_site1-01-701-1341</td>
 <td align="right">1</td>
-<td align="right">-1122.0892178</td>
-<td align="right">1.209217</td>
+<td align="right">-390.409416</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
@@ -491,10 +404,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
+<td align="left">sample_site1-01-701-1341</td>
 <td align="right">4</td>
-<td align="right">-153.0412865</td>
-<td align="right">1.209217</td>
+<td align="right">-1482.376594</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
@@ -502,10 +415,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
+<td align="left">sample_site1-01-701-1341</td>
 <td align="right">5</td>
-<td align="right">969.6642379</td>
-<td align="right">1.209217</td>
+<td align="right">-1142.662637</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
@@ -513,10 +426,10 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
-<td align="right">7</td>
-<td align="right">1212.8170738</td>
-<td align="right">1.209217</td>
+<td align="left">sample_site1-01-701-1444</td>
+<td align="right">1</td>
+<td align="right">252.433754</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
@@ -524,54 +437,164 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
+<td align="left">sample_site1-01-701-1444</td>
+<td align="right">4</td>
+<td align="right">1439.912228</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-701-1444</td>
+<td align="right">5</td>
+<td align="right">1320.091157</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-701-1444</td>
+<td align="right">7</td>
+<td align="right">9.214086</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-703-1096</td>
+<td align="right">1</td>
+<td align="right">-1305.988280</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-703-1096</td>
+<td align="right">5</td>
+<td align="right">-1400.438299</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-703-1258</td>
+<td align="right">1</td>
+<td align="right">-163.137851</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-703-1258</td>
+<td align="right">4</td>
+<td align="right">1226.684787</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-703-1258</td>
+<td align="right">5</td>
+<td align="right">1527.555509</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-703-1258</td>
+<td align="right">7</td>
+<td align="right">445.935765</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-703-1258</td>
 <td align="right">8</td>
-<td align="right">349.8636253</td>
-<td align="right">1.209217</td>
+<td align="right">-1008.609775</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
+<td align="left">sample_site1-01-703-1258</td>
 <td align="right">9</td>
-<td align="right">-821.5588729</td>
-<td align="right">1.209217</td>
+<td align="right">-1517.859254</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
+<td align="left">sample_site1-01-703-1258</td>
 <td align="right">10</td>
-<td align="right">-1232.5305830</td>
-<td align="right">1.209217</td>
+<td align="right">-602.288633</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
+<td align="left">sample_site1-01-703-1258</td>
 <td align="right">11</td>
-<td align="right">-497.8835914</td>
-<td align="right">1.209217</td>
+<td align="right">877.847056</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
+<td align="left">sample_site1-01-703-1258</td>
 <td align="right">12</td>
-<td align="right">700.7898365</td>
-<td align="right">1.209217</td>
+<td align="right">1576.362722</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1009</td>
+<td align="right">1</td>
+<td align="right">848.046284</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
@@ -579,197 +602,175 @@
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
 <td align="left">sample_site1</td>
-<td align="left">sample_site1-01-710-1249</td>
-<td align="right">13</td>
-<td align="right">1263.4348790</td>
-<td align="right">1.209217</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1047</td>
-<td align="right">1</td>
-<td align="right">1624.3964979</td>
-<td align="right">16.897054</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1047</td>
+<td align="left">sample_site1-01-704-1009</td>
 <td align="right">4</td>
-<td align="right">1747.5570455</td>
-<td align="right">16.897054</td>
+<td align="right">-627.894508</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1047</td>
-<td align="right">5</td>
-<td align="right">288.7320309</td>
-<td align="right">16.897054</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1025</td>
+<td align="right">1</td>
+<td align="right">-1525.695564</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
-<td align="right">1</td>
-<td align="right">-1418.1639736</td>
-<td align="right">16.897054</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1025</td>
+<td align="right">4</td>
+<td align="right">-979.310643</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1025</td>
 <td align="right">5</td>
-<td align="right">-1805.0604670</td>
-<td align="right">16.897054</td>
+<td align="right">483.594061</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
+<td align="right">1</td>
+<td align="right">1508.111314</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
+<td align="right">4</td>
+<td align="right">1167.513747</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
+<td align="right">5</td>
+<td align="right">-241.054807</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
 <td align="right">7</td>
-<td align="right">-517.0853884</td>
-<td align="right">16.897054</td>
+<td align="right">-1420.482311</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
 <td align="right">8</td>
-<td align="right">1267.0865425</td>
-<td align="right">16.897054</td>
+<td align="right">-1288.489162</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
 <td align="right">9</td>
-<td align="right">1900.0152759</td>
-<td align="right">16.897054</td>
+<td align="right">40.570748</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
 <td align="right">10</td>
-<td align="right">799.7890532</td>
-<td align="right">16.897054</td>
+<td align="right">1334.282240</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
 <td align="right">11</td>
-<td align="right">-1016.9686057</td>
-<td align="right">16.897054</td>
+<td align="right">1414.535351</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
 <td align="right">12</td>
-<td align="right">-1886.2615062</td>
-<td align="right">16.897054</td>
+<td align="right">199.465139</td>
+<td align="right">5.351146</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1133</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-704-1164</td>
 <td align="right">13</td>
-<td align="right">-1004.7851598</td>
-<td align="right">16.897054</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1146</td>
-<td align="right">1</td>
-<td align="right">815.1157503</td>
-<td align="right">16.897054</td>
+<td align="right">-1190.556635</td>
+<td align="right">5.351146</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
 <td align="right">100</td>
 <td align="left">autocorr</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1146</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-705-1199</td>
+<td align="right">1</td>
+<td align="right">-1473.469757</td>
+<td align="right">5.351146</td>
+</tr>
+<tr class="even">
+<td align="right">1</td>
+<td align="right">100</td>
+<td align="left">autocorr</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="left">sample_site1</td>
+<td align="left">sample_site1-01-705-1199</td>
 <td align="right">4</td>
-<td align="right">1900.3939295</td>
-<td align="right">16.897054</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1146</td>
-<td align="right">5</td>
-<td align="right">1254.3302295</td>
-<td align="right">16.897054</td>
-</tr>
-<tr class="odd">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1146</td>
-<td align="right">7</td>
-<td align="right">-535.2485727</td>
-<td align="right">16.897054</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">100</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1153</td>
-<td align="right">1</td>
-<td align="right">-1817.7701655</td>
-<td align="right">16.897054</td>
+<td align="right">-393.648835</td>
+<td align="right">5.351146</td>
 </tr>
 </tbody>
 </table>
