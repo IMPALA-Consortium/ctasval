@@ -52,17 +52,29 @@ library(tidyr)
 
 set.seed(1)
 
-df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
+df_prep <- prep_sdtm(
+  lb = pharmaversesdtm::lb,
+  vs = pharmaversesdtm::vs,
+  dm = pharmaversesdtm::dm,
+  scramble = TRUE
+)
 
 df_filt <- df_prep %>%
-  filter(parameter_id %in% c("Alkaline Phosphatase", "Alanine Aminotransferase")) %>%
-  filter(! grepl("UNSCH", VISIT) & !VISIT %in% c("AMBUL ECG REMOVAL", "RETRIEVAL"))
+  filter(parameter_id %in% c("Pulse Rate", "Alanine Aminotransferase")) %>%
+  filter(! grepl("UNSCH", timepoint_1_name) & !timepoint_1_name %in% c("AMBUL ECG REMOVAL", "RETRIEVAL"))
 
 plan(multisession, workers = 6)
 
 ctas <- ctasval(
   df = df_filt,
-  fun_anomaly = c(anomaly_average, anomaly_sd, anomaly_autocorr, anomaly_lof, anomaly_range, anomaly_unique_value_count_relative),
+  fun_anomaly = c(
+    anomaly_average,
+    anomaly_sd,
+    anomaly_autocorr,
+    anomaly_lof,
+    anomaly_range,
+    anomaly_unique_value_count_relative
+  ),
   feats = c("average", "sd", "autocorr", "lof", "range", "unique_value_count_relative"),
   parallel = TRUE,
   iter = 100,

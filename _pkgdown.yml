@@ -14,8 +14,7 @@ reference:
   - title: Data Preparation
     desc: ~
     contents:
-      - prep_sdtm_lb
-      - prep_sdtm_vs
+      - starts_with("prep_")
   - title: Helpers
     desc: ~
     contents:
