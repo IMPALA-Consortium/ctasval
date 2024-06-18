@@ -1,3 +1,46 @@
+#' Prepare SDTM Data
+#' @inheritParams prep_sdtm_lb
+#' @inheritParams prep_sdtm_vs
+#' @export
+prep_sdtm <- function(lb, vs, dm, scramble = TRUE) {
+
+  if (scramble) {
+    dm <- scramble_sites(dm)
+  }
+
+  df_prep <- bind_rows(
+      prep_sdtm_lb(lb, dm, scramble = FALSE),
+      prep_sdtm_vs(vs, dm, scramble = FALSE)
+    ) %>%
+    select(
+      subject_id,
+      site,
+      timepoint_1_name,
+      timepoint_2_name,
+      timepoint_rank,
+      parameter_id,
+      parameter_name,
+      parameter_category_1,
+      baseline,
+      result
+    )
+
+  return(df_prep)
+
+}
+
+#' @keywords internal
+scramble_sites <- function(dm) {
+  dm$SITEID <- sample(
+    dm$SITEID,
+    replace = FALSE,
+    size = length(dm$SITEID)
+  )
+
+  return(dm)
+}
+
+
 #' Prepare SDTM LB Data
 #'
 #' This function prepares the LB (Laboratory) data for SDTM (Study Data Tabulation Model) by merging it with the DM (Demographics) data.
@@ -8,12 +51,9 @@
 #' @return A data frame with the prepared SDTM LB data.
 #' @export
 prep_sdtm_lb <- function(lb, dm, scramble = TRUE) {
+
   if (scramble) {
-    dm$SITEID <- sample(
-      dm$SITEID,
-      replace = FALSE,
-      size = length(dm$SITEID)
-    )
+    dm <- scramble_sites(dm)
   }
 
   df_prep <- lb %>%
@@ -45,17 +85,13 @@ prep_sdtm_lb <- function(lb, dm, scramble = TRUE) {
 #' This function prepares the VS (Vital Sign) data for SDTM (Study Data Tabulation Model) by merging it with the DM (Demographics) data.
 #'
 #' @param vs Data frame containing the VS data.
-#' @param dm Data frame containing the DM data.
-#' @param scramble Logical indicating whether to scramble the SITEID in the DM data. Default is TRUE.
+#' @inheritParams prep_sdtm_lb
 #' @return A data frame with the prepared SDTM LB data.
 #' @export
 prep_sdtm_vs <- function(vs, dm, scramble = TRUE) {
+
   if (scramble) {
-    dm$SITEID <- sample(
-      dm$SITEID,
-      replace = FALSE,
-      size = length(dm$SITEID)
-    )
+    dm <- scramble_sites(dm)
   }
 
   df_prep <- vs %>%
