@@ -121,7 +121,7 @@ df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRU
 df_filt <- df_prep \%>\%
   filter(parameter_id == "Alkaline Phosphatase")
 
-df_anomaly <- anomaly_sd(df_filt, anomaly_degree = 2, site = "anomolous")
+df_anomaly <- anomaly_unique_value_count_relative(df_filt, anomaly_degree = 2, site = "anomolous")
 
 ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
 geom_line(color = "black") +
