@@ -3,15 +3,15 @@
 #' @inheritParams prep_sdtm_vs
 #' @export
 prep_sdtm <- function(lb, vs, dm, scramble = TRUE) {
-
+  
   if (scramble) {
     dm <- scramble_sites(dm)
   }
-
+  
   df_prep <- bind_rows(
-      prep_sdtm_lb(lb, dm, scramble = FALSE),
-      prep_sdtm_vs(vs, dm, scramble = FALSE)
-    ) %>%
+    prep_sdtm_lb(lb, dm, scramble = FALSE),
+    prep_sdtm_vs(vs, dm, scramble = FALSE)
+  ) %>%
     select(
       subject_id,
       site,
@@ -24,9 +24,9 @@ prep_sdtm <- function(lb, vs, dm, scramble = TRUE) {
       baseline,
       result
     )
-
+  
   return(df_prep)
-
+  
 }
 
 #' @keywords internal
@@ -36,7 +36,7 @@ scramble_sites <- function(dm) {
     replace = FALSE,
     size = length(dm$SITEID)
   )
-
+  
   return(dm)
 }
 
@@ -51,11 +51,11 @@ scramble_sites <- function(dm) {
 #' @return A data frame with the prepared SDTM LB data.
 #' @export
 prep_sdtm_lb <- function(lb, dm, scramble = TRUE) {
-
+  
   if (scramble) {
     dm <- scramble_sites(dm)
   }
-
+  
   df_prep <- lb %>%
     mutate(
       timepoint_rank = .data$VISITNUM,
@@ -76,7 +76,7 @@ prep_sdtm_lb <- function(lb, dm, scramble = TRUE) {
       subject_id = "USUBJID",
       site = "SITEID"
     ))
-
+  
   return(df_prep)
 }
 
@@ -89,11 +89,11 @@ prep_sdtm_lb <- function(lb, dm, scramble = TRUE) {
 #' @return A data frame with the prepared SDTM LB data.
 #' @export
 prep_sdtm_vs <- function(vs, dm, scramble = TRUE) {
-
+  
   if (scramble) {
     dm <- scramble_sites(dm)
   }
-
+  
   df_prep <- vs %>%
     mutate(
       timepoint_rank = .data$VISITNUM,
@@ -114,7 +114,7 @@ prep_sdtm_vs <- function(vs, dm, scramble = TRUE) {
       subject_id = "USUBJID",
       site = "SITEID"
     ))
-
+  
   return(df_prep)
 }
 
@@ -138,7 +138,7 @@ get_ctas <- function(df, feats,
                      default_max_share_missing_timepoints_per_series = 0.5,
                      default_generate_change_from_baseline = FALSE,
                      autogenerate_timeseries = TRUE) {
-
+  
   parameters <- df %>%
     distinct(
       .data$parameter_id,
@@ -155,14 +155,14 @@ get_ctas <- function(df, feats,
       timeseries_features_to_calculate = NA,
       use_only_custom_timeseries = FALSE # should have datatype check
     )
-
+  
   subjects <- df %>%
     distinct(.data$subject_id, .data$site) %>%
     mutate(
       country = "no",
       region = "no"
     )
-
+  
   data <- df %>%
     select(c(
       "subject_id",
@@ -173,8 +173,8 @@ get_ctas <- function(df, feats,
       "result",
       "baseline"
     ))
-
-  ls_ctas <- ctas::process_a_study(
+  
+  ls_ctas <- process_a_study(
     data = data,
     subjects = subjects,
     parameters = parameters,
@@ -187,24 +187,23 @@ get_ctas <- function(df, feats,
     default_generate_change_from_baseline = default_generate_change_from_baseline,
     autogenerate_timeseries = autogenerate_timeseries
   )
-
+  
   data_ctas_prep <- ls_ctas$site_scores %>%
+    rename(site = entity) %>%
+    ungroup() %>%
     left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
     summarise(
-      score = max(.data$fdr_corrected_pvalue_logp),
+      is_signal = max(.data$is_signal),
       .by = c("site", "parameter_id")
     )
-
+  
   data_ctas <- df %>%
     distinct(.data$site, .data$parameter_id) %>%
     left_join(
       data_ctas_prep,
       by = c("site", "parameter_id")
-    ) %>%
-    mutate(
-      score = ifelse(is.na(.data$score), 0, .data$score)
     )
-
+  
   return(data_ctas)
 }
 
@@ -218,7 +217,7 @@ get_ctas <- function(df, feats,
 #' @keywords internal
 #' @seealso \code{\link{anomaly_average}}, \code{\link{anomaly_sd}}
 sample_site <- function(df, site = "sample_site") {
-
+  
   df_n_sites <- df %>%
     summarise(
       n_pat_site_param = n_distinct(.data$subject_id),
@@ -226,17 +225,17 @@ sample_site <- function(df, site = "sample_site") {
     ) %>%
     slice_sample(n = 1, by = "parameter_id") %>%
     select(c("parameter_id", "n_pat_site_param"))
-
+  
   subject_id <- unique(df$subject_id)
-
+  
   subj_rdn_id <- sample(
     seq(1, length(subject_id)),
     length(subject_id),
     replace = FALSE
   )
-
+  
   names(subj_rdn_id) <- subject_id
-
+  
   df_sample_site <- df %>%
     mutate(
       subject_random = subj_rdn_id[.data$subject_id]
@@ -255,7 +254,7 @@ sample_site <- function(df, site = "sample_site") {
       subject_id = paste0(.data$site, "-", .data$subject_id)
     ) %>%
     select(- c("subject_random", "n_pat_site_param"))
-
+  
   return(df_sample_site)
 }
 
@@ -274,7 +273,7 @@ sample_site <- function(df, site = "sample_site") {
 #' @keywords internal
 #' @seealso \code{\link{get_anomaly_scores}}
 get_anomaly_data <- function(df, n_sites, fun_anomaly, anomaly_degree, site_prefix = "site") {
-
+  
   grid <- tibble(
     site_anomaly = paste0(site_prefix, seq(1, n_sites))
   ) %>%
@@ -288,12 +287,12 @@ get_anomaly_data <- function(df, n_sites, fun_anomaly, anomaly_degree, site_pref
         )
       )
     )
-
+  
   df_anomaly <- bind_rows(df, grid$site_data) %>%
     mutate(
       method = max(.data$method, na.rm = TRUE)
     )
-
+  
   return(df_anomaly)
 }
 
@@ -321,7 +320,7 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
                                default_max_share_missing_timepoints_per_series = 0.5,
                                default_generate_change_from_baseline = FALSE,
                                autogenerate_timeseries = TRUE) {
-
+  
   df_anomaly <- get_anomaly_data(
     df = df,
     n_sites = n_sites,
@@ -329,7 +328,7 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
     anomaly_degree = anomaly_degree,
     site_prefix = "sample_site"
   )
-
+  
   df_ctas <- get_ctas(
     df = df_anomaly,
     feats = feats,
@@ -342,14 +341,14 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
     mutate(
       is_P = startsWith(.data$site, "sample_site")
     )
-
+  
   if (!is.null(thresh)) {
     df_thresh <- df_ctas %>%
       mutate(
         classification = case_when(
-          .data$is_P & .data$score >= thresh ~ "TP",
-          .data$is_P & .data$score < thresh ~ "FN",
-          .data$score >= thresh ~ "FP",
+          .data$is_P & .data$is_signal == 1 ~ "TP",
+          .data$is_P & .data$is_signal == 0 ~ "FN",
+          .data$is_signal == 1 ~ "FP",
           TRUE ~ "TN"
         ),
         classification = factor(.data$classification, levels = c("TP", "FN", "FP", "TN"))
@@ -360,20 +359,20 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
       ) %>%
       complete(.data$classification, .data$parameter_id, fill = list(n = 0)) %>%
       pivot_wider(names_from = "classification", values_from = "n", values_fill = 0)
-
+    
     df_result <- df_thresh
   } else {
     df_result <- df_ctas
   }
-
+  
   df_anomaly_filt <- df_anomaly %>%
     filter(startsWith(.data$site, "sample_site")) %>%
     left_join(
       df_ctas %>%
-        distinct(.data$site, .data$parameter_id, .data$score),
-        by = c("site", "parameter_id")
+        distinct(.data$site, .data$parameter_id, .data$is_signal),
+      by = c("site", "parameter_id")
     )
-
+  
   structure(
     list(
       result = df_result,
@@ -434,7 +433,7 @@ ctasval <- function(df,
                     default_generate_change_from_baseline = FALSE,
                     autogenerate_timeseries = TRUE) {
   stopifnot("Each 'fun_anomaly' must be paired with one 'feats'" = length(fun_anomaly) == length(feats))
-
+  
   df_grid <- tibble(
     iter = seq(1, iter),
     anomaly_degree = list(anomaly_degree),
@@ -442,16 +441,16 @@ ctasval <- function(df,
   ) %>%
     unnest(anomaly_degree) %>%
     unnest(fun_anomaly)
-
+  
   if (parallel) {
     fun_purrr <- furrr::future_pmap
     purrr_args <- list(.options = furrr::furrr_options(seed = TRUE))
   } else {
     fun_purrr <- purrr::pmap
     purrr_args <- list()
-
+    
   }
-
+  
   simaerep::with_progress_cnd(
     df_result <- df_grid %>%
       mutate(
@@ -476,7 +475,7 @@ ctasval <- function(df,
       ),
     progress = progress
   )
-
+  
   df_perf <- df_result %>%
     mutate(ctas = map(.data$ctas, "result")) %>%
     unnest("ctas") %>%
@@ -491,11 +490,11 @@ ctasval <- function(df,
       fpr = .data$FP / (.data$FP + .data$TN)
     ) %>%
     ungroup()
-
+  
   df_anomaly <- df_result %>%
     mutate(ctas = map(.data$ctas, "anomaly")) %>%
     unnest("ctas")
-
+  
   structure(
     list(
       result = df_perf,
