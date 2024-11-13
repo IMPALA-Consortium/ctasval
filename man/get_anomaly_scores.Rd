@@ -15,7 +15,8 @@ get_anomaly_scores(
   default_minimum_subjects_per_series = 3,
   default_max_share_missing_timepoints_per_series = 0.5,
   default_generate_change_from_baseline = FALSE,
-  autogenerate_timeseries = TRUE
+  autogenerate_timeseries = TRUE,
+  site_scoring_method
 )
 }
 \arguments{
@@ -40,6 +41,8 @@ get_anomaly_scores(
 \item{default_generate_change_from_baseline}{Logical indicating whether to generate change from baseline. Default is FALSE.}
 
 \item{autogenerate_timeseries}{Logical indicating whether to auto-generate timeseries. Default is TRUE.}
+
+\item{site_scoring_method}{How to score sites ("ks" = Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling, "avg_feat_value" = Average site feature value.}
 }
 \value{
 A data frame with the anomaly scores.
