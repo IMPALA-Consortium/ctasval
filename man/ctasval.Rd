@@ -18,7 +18,8 @@ ctasval(
   default_minimum_subjects_per_series = 3,
   default_max_share_missing_timepoints_per_series = 0.5,
   default_generate_change_from_baseline = FALSE,
-  autogenerate_timeseries = TRUE
+  autogenerate_timeseries = TRUE,
+  site_scoring_method
 )
 }
 \arguments{
