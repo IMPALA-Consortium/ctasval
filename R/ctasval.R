@@ -209,7 +209,27 @@ get_ctas <- function(df, feats,
         score = ifelse(is.na(.data$score), 0, .data$score)
       )
     
-  } else {
+     } else if(site_scoring_method == "mixedeffects") {
+      
+      data_ctas_prep <- ls_ctas$site_scores %>%
+        rename(site = entity) %>%
+        left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
+        summarise(
+          score = max(.data$fdr_corrected_pvalue_logp),
+          .by = c("site", "parameter_id")
+        )
+      
+      data_ctas <- df %>%
+        distinct(.data$site, .data$parameter_id) %>%
+        left_join(
+          data_ctas_prep,
+          by = c("site", "parameter_id")
+        ) %>%
+        mutate(
+          score = ifelse(is.na(.data$score), 0, .data$score)
+        )
+    
+    } else if(site_scoring_method == "avg_feat_value") {
     
     data_ctas_prep <- ls_ctas$site_scores %>%
       rename(site = entity) %>%
@@ -372,7 +392,7 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
       is_P = startsWith(.data$site, "sample_site")
     )
   
-  if(site_scoring_method == "ks") {
+  if(site_scoring_method %in% c("ks", "mixedeffects")) {
     
     df_ctas <- df_ctas %>%
       mutate(is_signal = ifelse(.data$score >= .env$thresh, 1, 0))
