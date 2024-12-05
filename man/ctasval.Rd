@@ -19,7 +19,7 @@ ctasval(
   default_max_share_missing_timepoints_per_series = 0.5,
   default_generate_change_from_baseline = FALSE,
   autogenerate_timeseries = TRUE,
-  site_scoring_method
+  site_scoring_method = "ks"
 )
 }
 \arguments{
@@ -29,7 +29,8 @@ ctasval(
 
 \item{feats}{List of features to calculate for the timeseries.}
 
-\item{anomaly_degree}{Vector of anomaly degrees to add. Default is c(0, 0.5, 1, 5, 10, 50).}
+\item{anomaly_degree}{Vector of anomaly degrees to add. Default is c(0, 0.5,
+1, 5, 10, 50).}
 
 \item{thresh}{Threshold for classification. Default is 1.0.}
 
@@ -37,25 +38,36 @@ ctasval(
 
 \item{n_sites}{Number of sites to generate. Default is 3.}
 
-\item{parallel}{Logical indicating whether to run in parallel. Default is FALSE.}
+\item{parallel}{Logical indicating whether to run in parallel. Default is
+FALSE.}
 
 \item{progress}{Logical indicating whether to show progress. Default is TRUE.}
 
-\item{default_minimum_timepoints_per_series}{Minimum timepoints per series. Default is 3.}
+\item{default_minimum_timepoints_per_series}{Minimum timepoints per series.
+Default is 3.}
 
-\item{default_minimum_subjects_per_series}{Minimum subjects per series. Default is 3.}
+\item{default_minimum_subjects_per_series}{Minimum subjects per series.
+Default is 3.}
 
-\item{default_max_share_missing_timepoints_per_series}{Maximum share of missing timepoints per series. Default is 0.5.}
+\item{default_max_share_missing_timepoints_per_series}{Maximum share of
+missing timepoints per series. Default is 0.5.}
 
-\item{default_generate_change_from_baseline}{Logical indicating whether to generate change from baseline. Default is FALSE.}
+\item{default_generate_change_from_baseline}{Logical indicating whether to
+generate change from baseline. Default is FALSE.}
 
-\item{autogenerate_timeseries}{Logical indicating whether to auto-generate timeseries. Default is TRUE.}
+\item{autogenerate_timeseries}{Logical indicating whether to auto-generate
+timeseries. Default is TRUE.}
+
+\item{site_scoring_method}{site_scoring_method How to score sites ("ks" =
+Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling,
+"avg_feat_value" = Average site feature value. Default:ks}
 }
 \value{
 A list containing the performance metrics and anomaly data.
 }
 \description{
-This function performs CTAS validation by generating anomalies, calculating scores, and summarizing performance metrics.
+This function performs CTAS validation by generating anomalies, calculating
+scores, and summarizing performance metrics.
 }
 \examples{
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
