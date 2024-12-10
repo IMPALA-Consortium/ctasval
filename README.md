@@ -225,3 +225,14 @@ ctas$anomaly %>%
 |    1 |            100 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1137 |              4 | -1047.437050 | 4.535962 |
 |    1 |            100 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1137 |              5 | -1310.449399 | 4.535962 |
 |    1 |            100 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1137 |              7 |  -349.527264 | 4.535962 |
+
+## Publication
+
+these commands render publication to `pub/`
+
+to edit publication edit `inst/pub/ctasvalidation.qmd`
+
+``` r
+quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "html")
+quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "docx")
+```

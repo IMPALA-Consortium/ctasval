@@ -14,6 +14,7 @@ Authors@R: c(
   person("IMPALA",
     role = "cph")
   )
+URL: https://impala-consortium.github.io/ctasval
 Description: What the package does (one paragraph).
 License: MIT + file LICENSE
 Encoding: UTF-8
