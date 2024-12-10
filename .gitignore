@@ -1,6 +1,10 @@
 .Rproj.user
 docs
-inst/doc
 .Rhistory
 .DS_Store
 docs
+.quarto/
+*.csv
+inst/pub/*.html
+inst/pub/*.docx
+/pub/

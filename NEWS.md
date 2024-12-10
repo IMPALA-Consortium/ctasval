@@ -1,2 +1,3 @@
-# v0.0.2 
+# ctasval v0.0.2 
 - adapt to ctas site_scoring methods
+- add publication draft
