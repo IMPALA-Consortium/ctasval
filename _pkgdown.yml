@@ -25,4 +25,6 @@ navbar:
     left:
     - home
     - reference
+    - articles
     right: github
+

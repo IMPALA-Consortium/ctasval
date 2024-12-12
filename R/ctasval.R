@@ -9,21 +9,21 @@ prep_sdtm <- function(lb, vs, dm, scramble = TRUE) {
   }
 
   df_prep <- bind_rows(
-      prep_sdtm_lb(lb, dm, scramble = FALSE),
-      prep_sdtm_vs(vs, dm, scramble = FALSE)
-    ) %>%
-    select(
-      subject_id,
-      site,
-      timepoint_1_name,
-      timepoint_2_name,
-      timepoint_rank,
-      parameter_id,
-      parameter_name,
-      parameter_category_1,
-      baseline,
-      result
-    )
+    prep_sdtm_lb(lb, dm, scramble = FALSE),
+    prep_sdtm_vs(vs, dm, scramble = FALSE)
+  ) %>%
+    select(c(
+      "subject_id",
+      "site",
+      "timepoint_1_name",
+      "timepoint_2_name",
+      "timepoint_rank",
+      "parameter_id",
+      "parameter_name",
+      "parameter_category_1",
+      "baseline",
+      "result"
+    ))
 
   return(df_prep)
 
@@ -137,7 +137,8 @@ get_ctas <- function(df, feats,
                      default_minimum_subjects_per_series = 3,
                      default_max_share_missing_timepoints_per_series = 0.5,
                      default_generate_change_from_baseline = FALSE,
-                     autogenerate_timeseries = TRUE) {
+                     autogenerate_timeseries = TRUE,
+                     site_scoring_method) {
 
   parameters <- df %>%
     distinct(
@@ -174,7 +175,7 @@ get_ctas <- function(df, feats,
       "baseline"
     ))
 
-  ls_ctas <- ctas::process_a_study(
+  ls_ctas <- process_a_study(
     data = data,
     subjects = subjects,
     parameters = parameters,
@@ -185,25 +186,70 @@ get_ctas <- function(df, feats,
     default_minimum_subjects_per_series = default_minimum_subjects_per_series,
     default_max_share_missing_timepoints_per_series = default_max_share_missing_timepoints_per_series,
     default_generate_change_from_baseline = default_generate_change_from_baseline,
-    autogenerate_timeseries = autogenerate_timeseries
+    autogenerate_timeseries = autogenerate_timeseries,
+    site_scoring_method = site_scoring_method
   )
 
-  data_ctas_prep <- ls_ctas$site_scores %>%
-    left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
-    summarise(
-      score = max(.data$fdr_corrected_pvalue_logp),
-      .by = c("site", "parameter_id")
-    )
+  if(site_scoring_method == "ks") {
 
-  data_ctas <- df %>%
-    distinct(.data$site, .data$parameter_id) %>%
-    left_join(
-      data_ctas_prep,
-      by = c("site", "parameter_id")
-    ) %>%
-    mutate(
-      score = ifelse(is.na(.data$score), 0, .data$score)
-    )
+    data_ctas_prep <- ls_ctas$site_scores %>%
+      left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
+      summarise(
+        score = max(.data$fdr_corrected_pvalue_logp),
+        .by = c("site", "parameter_id")
+      )
+
+    data_ctas <- df %>%
+      distinct(.data$site, .data$parameter_id) %>%
+      left_join(
+        data_ctas_prep,
+        by = c("site", "parameter_id")
+      ) %>%
+      mutate(
+        score = ifelse(is.na(.data$score), 0, .data$score)
+      )
+
+     } else if(site_scoring_method == "mixedeffects") {
+
+      data_ctas_prep <- ls_ctas$site_scores %>%
+        rename(site = "entity") %>%
+        left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
+        summarise(
+          score = max(.data$fdr_corrected_pvalue_logp),
+          .by = c("site", "parameter_id")
+        )
+
+      data_ctas <- df %>%
+        distinct(.data$site, .data$parameter_id) %>%
+        left_join(
+          data_ctas_prep,
+          by = c("site", "parameter_id")
+        ) %>%
+        mutate(
+          score = ifelse(is.na(.data$score), 0, .data$score)
+        )
+
+    } else if(site_scoring_method == "avg_feat_value") {
+
+    data_ctas_prep <- ls_ctas$site_scores %>%
+      rename(site = "entity") %>%
+      ungroup() %>%
+      left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
+      summarise(
+        is_signal = max(.data$is_signal),
+        .by = c("site", "parameter_id")
+      )
+
+    data_ctas <- df %>%
+      distinct(.data$site, .data$parameter_id) %>%
+      left_join(
+        data_ctas_prep,
+        by = c("site", "parameter_id")
+      )
+
+  }
+
+
 
   return(data_ctas)
 }
@@ -312,6 +358,7 @@ get_anomaly_data <- function(df, n_sites, fun_anomaly, anomaly_degree, site_pref
 #' @param default_max_share_missing_timepoints_per_series Maximum share of missing timepoints per series. Default is 0.5.
 #' @param default_generate_change_from_baseline Logical indicating whether to generate change from baseline. Default is FALSE.
 #' @param autogenerate_timeseries Logical indicating whether to auto-generate timeseries. Default is TRUE.
+#' @param site_scoring_method How to score sites ("ks" = Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling, "avg_feat_value" = Average site feature value.
 #' @return A data frame with the anomaly scores.
 #' @keywords internal
 #' @seealso \code{\link{ctasval}}
@@ -320,7 +367,8 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
                                default_minimum_subjects_per_series = 3,
                                default_max_share_missing_timepoints_per_series = 0.5,
                                default_generate_change_from_baseline = FALSE,
-                               autogenerate_timeseries = TRUE) {
+                               autogenerate_timeseries = TRUE,
+                               site_scoring_method) {
 
   df_anomaly <- get_anomaly_data(
     df = df,
@@ -337,21 +385,33 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
     default_minimum_subjects_per_series = default_minimum_subjects_per_series,
     default_max_share_missing_timepoints_per_series = default_max_share_missing_timepoints_per_series,
     default_generate_change_from_baseline = default_generate_change_from_baseline,
-    autogenerate_timeseries = autogenerate_timeseries
+    autogenerate_timeseries = autogenerate_timeseries,
+    site_scoring_method = site_scoring_method
   ) %>%
     mutate(
       is_P = startsWith(.data$site, "sample_site")
     )
 
+  if(site_scoring_method %in% c("ks", "mixedeffects")) {
+
+    df_ctas <- df_ctas %>%
+      mutate(is_signal = ifelse(.data$score >= .env$thresh, 1, 0))
+
+  }
+
   if (!is.null(thresh)) {
     df_thresh <- df_ctas %>%
       mutate(
-        classification = case_when(
-          .data$is_P & .data$score >= thresh ~ "TP",
-          .data$is_P & .data$score < thresh ~ "FN",
-          .data$score >= thresh ~ "FP",
-          TRUE ~ "TN"
-        ),
+
+        classification =
+
+            case_when(
+              .data$is_P & .data$is_signal == 1 ~ "TP",
+              .data$is_P & .data$is_signal == 0 ~ "FN",
+              .data$is_signal == 1 ~ "FP",
+              TRUE ~ "TN"
+            ),
+
         classification = factor(.data$classification, levels = c("TP", "FN", "FP", "TN"))
       ) %>%
       summarise(
@@ -370,8 +430,8 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
     filter(startsWith(.data$site, "sample_site")) %>%
     left_join(
       df_ctas %>%
-        distinct(.data$site, .data$parameter_id, .data$score),
-        by = c("site", "parameter_id")
+        distinct(.data$site, .data$parameter_id, .data$score, .data$is_signal),
+      by = c("site", "parameter_id")
     )
 
   structure(
@@ -385,22 +445,33 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
 
 #' CTAS Validation
 #'
-#' This function performs CTAS validation by generating anomalies, calculating scores, and summarizing performance metrics.
+#' This function performs CTAS validation by generating anomalies, calculating
+#' scores, and summarizing performance metrics.
 #'
 #' @param df Data frame containing the study data.
 #' @param fun_anomaly List of functions to apply to generate anomalies.
 #' @param feats List of features to calculate for the timeseries.
-#' @param anomaly_degree Vector of anomaly degrees to add. Default is c(0, 0.5, 1, 5, 10, 50).
+#' @param anomaly_degree Vector of anomaly degrees to add. Default is c(0, 0.5,
+#'   1, 5, 10, 50).
 #' @param thresh Threshold for classification. Default is 1.0.
 #' @param iter Number of iterations to run. Default is 100.
 #' @param n_sites Number of sites to generate. Default is 3.
-#' @param parallel Logical indicating whether to run in parallel. Default is FALSE.
+#' @param parallel Logical indicating whether to run in parallel. Default is
+#'   FALSE.
 #' @param progress Logical indicating whether to show progress. Default is TRUE.
-#' @param default_minimum_timepoints_per_series Minimum timepoints per series. Default is 3.
-#' @param default_minimum_subjects_per_series Minimum subjects per series. Default is 3.
-#' @param default_max_share_missing_timepoints_per_series Maximum share of missing timepoints per series. Default is 0.5.
-#' @param default_generate_change_from_baseline Logical indicating whether to generate change from baseline. Default is FALSE.
-#' @param autogenerate_timeseries Logical indicating whether to auto-generate timeseries. Default is TRUE.
+#' @param default_minimum_timepoints_per_series Minimum timepoints per series.
+#'   Default is 3.
+#' @param default_minimum_subjects_per_series Minimum subjects per series.
+#'   Default is 3.
+#' @param default_max_share_missing_timepoints_per_series Maximum share of
+#'   missing timepoints per series. Default is 0.5.
+#' @param default_generate_change_from_baseline Logical indicating whether to
+#'   generate change from baseline. Default is FALSE.
+#' @param autogenerate_timeseries Logical indicating whether to auto-generate
+#'   timeseries. Default is TRUE.
+#' @param site_scoring_method site_scoring_method How to score sites ("ks" =
+#'   Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling,
+#'   "avg_feat_value" = Average site feature value. Default:ks
 #' @return A list containing the performance metrics and anomaly data.
 #' @export
 #' @examples
@@ -432,7 +503,9 @@ ctasval <- function(df,
                     default_minimum_subjects_per_series = 3,
                     default_max_share_missing_timepoints_per_series = 0.5,
                     default_generate_change_from_baseline = FALSE,
-                    autogenerate_timeseries = TRUE) {
+                    autogenerate_timeseries = TRUE,
+                    site_scoring_method = "ks") {
+
   stopifnot("Each 'fun_anomaly' must be paired with one 'feats'" = length(fun_anomaly) == length(feats))
 
   df_grid <- tibble(
@@ -467,7 +540,8 @@ ctasval <- function(df,
             default_minimum_subjects_per_series = default_minimum_subjects_per_series,
             default_max_share_missing_timepoints_per_series = default_max_share_missing_timepoints_per_series,
             default_generate_change_from_baseline = default_generate_change_from_baseline,
-            autogenerate_timeseries = autogenerate_timeseries
+            autogenerate_timeseries = autogenerate_timeseries,
+            site_scoring_method = site_scoring_method
           ),
           .purrr_args = purrr_args,
           .steps = nrow(df_grid),

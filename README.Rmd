@@ -122,3 +122,16 @@ ctas$anomaly %>%
   knitr::kable()
 
 ```
+
+
+## Publication
+
+these commands render publication to `pub/`
+
+to edit publication edit `inst/pub/ctasvalidation.qmd`
+
+```{r eval=FALSE}
+quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "html")
+quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "docx")
+```
+
