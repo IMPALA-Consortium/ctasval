@@ -114,7 +114,7 @@ ctas
 #> # ℹ 86 more rows
 #> 
 #> $anomaly
-#> # A tibble: 8,332,852 × 17
+#> # A tibble: 8,332,852 × 18
 #>     iter anomaly_degree fun_anomaly feats   subject_id    site  timepoint_1_name
 #>    <int>          <dbl> <list>      <chr>   <chr>         <chr> <chr>           
 #>  1     1              0 <fn>        average sample_site1… samp… SCREENING 1     
@@ -128,9 +128,10 @@ ctas
 #>  9     1              0 <fn>        average sample_site1… samp… WEEK 24         
 #> 10     1              0 <fn>        average sample_site1… samp… WEEK 26         
 #> # ℹ 8,332,842 more rows
-#> # ℹ 10 more variables: timepoint_2_name <chr>, timepoint_rank <dbl>,
+#> # ℹ 11 more variables: timepoint_2_name <chr>, timepoint_rank <dbl>,
 #> #   parameter_id <chr>, parameter_name <chr>, parameter_category_1 <chr>,
-#> #   baseline <lgl>, result <dbl>, method <chr>, score <dbl>, add_outlier <lgl>
+#> #   baseline <lgl>, result <dbl>, method <chr>, score <dbl>, is_signal <dbl>,
+#> #   add_outlier <lgl>
 #> 
 #> attr(,"class")
 #> [1] "ctasval_aggregated"
@@ -224,3 +225,14 @@ ctas$anomaly %>%
 |    1 |            100 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1137 |              4 | -1047.437050 | 4.535962 |
 |    1 |            100 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1137 |              5 | -1310.449399 | 4.535962 |
 |    1 |            100 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1137 |              7 |  -349.527264 | 4.535962 |
+
+## Publication
+
+these commands render publication to `pub/`
+
+to edit publication edit `inst/pub/ctasvalidation.qmd`
+
+``` r
+quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "html")
+quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "docx")
+```
