@@ -111,9 +111,28 @@ In addition to flagging sites, the results are valuable for identifying individu
 
 To evaluate ctas performance for detecting sites with anomolus time series we selected data from two laboraty (Alanine Aminotransferase, Creatinine) and two vitals mesurements (Systolic Blood Pressure, Weight) from a clinical trial data set and reassigned all patients to different sites to eliminate any existing site-specific anomalies. For each anomaly in scope we applied a specific transformation with a given degree to the measurements of three randomly selected sites. (i) Autocorrelation was introduced by adding a sinus signal multiplied by the anomaly degree to the original values. (ii) The average was increased by adding the site mean multiplied by the anomaly degree to the original values. (iii) The local outlier factor for a site would be increased by transforming the data for each patient by a randomly chosen non-normal distribution. The anomaly degree would determine the ratio of affected patients. (iv) To simulate range outliers we added one outlier per patient. The extremity of the outlier is based on the anomaly degree. (v) The standard deviation is increased by adding the site mean multiplied with the anomaly degree to each observations and randomly applying a negative or positive fore-sign. (vi) The unique value count per site was increased by replacing a ratio of observations with the first observed value per patient. The ratio would be determined by the anomaly degree. The anomalies introduced are visualised in @fig-anomalies. 
 
-Subsequently we tried to detect the three anomlous sites using different site scoring methods among the compliant sites in the study data set. This was repeated a 100 times and true positive rate (TPR) and false positive rate (FPR) were calculated using the combined results. In total 15 completed studies were selected from 3 different IMPALA members in triplicates with comparable patient and site number see @fig-results.
+Subsequently we tried to detect the three anomlous sites using different site scoring methods among the compliant sites in the study data set. This was repeated a 100 times and true positive rate (TPR) and false positive rate (FPR) were calculated using the combined results. In total 15 completed studies were selected from 3 different IMPALA members in triplicates with comparable patient and site number.
+
+
 
 # Results and Discussion (required section)
+
+We have tested three different scoring methods trying to detect 5 different types of site anomalies that were introduced with varying degrees to 15 study data sets donated by 3 different IMPALA members across 4 different timeseries metrics. The resulting average TPR and FPR with their respective standard deviations were plotted in @fig-results which shows that TPR are responsive to the degree of the anomlies that were introduced while FPR remain indifferent.
+
+We observe that the average method has the highest TPR detecting almost all high degree anomalies at the cost of having the highest FPR among the scoring methods that we tested. The ks method has the lowest FPR but also the lowest TPR. While the mixedeffects and the average method both are able to detect simpler high degree anomalies, such as anomalies increasing the site average, with relative certainty the ks method struggles to detect more than half of the sites with such high degree anomalies.
+
+We do not observe strong differences between the timeseries metrics. Some of them are more suceptible to the introduction of the anomalies and tend to result in higher TPR at lower anomaly degrees. This is to be expected as the anomalies use multiplication of the existing measurement that are more sensitive to higher starting values. An exception is the weight metric for which ctase only reaches a TPR of less than 0.5 when trying to detect unique value outliers. 
+
+Autocorrelation and local outlier factor anomalies which are more complex than the other anomalies are also difficult to detect we bareley detected half of the outliers that were introduced.
+
+# Discussion
+
+Alltogether this evaluation of the ctas algorithm has shown that timeseries anomalies can be detected by 
+
+The ks method is a rank based test and does not account for the magnitude of an observed difference between two groups. Therefore sites with less than three patients will never be assigned a low p-value and thus will never get detected as an anomolous site. The ratio of such small sites across all of the studies is roughly 20% which explains the lower TPR when using the ks method.
+
+
+The explanation here is that the majority of the studies only measured weight during screening. For a timeseries of length one all patients will have a relative unique value count of 1.
 
 > The Results section should briefly present the experimental data in text, tables or figures. Tables and figures should not be described extensively in the text. The Discussion should focus on the interpretation and the significance of the findings with concise objective comments that describe their relation to other work in the area. It should not repeat information in the results.
 
