@@ -67,12 +67,12 @@ test_that("anomaly_unique_value_count works correctly", {
   df_prep <- prep_sdtm_lb(lb, dm, scramble = TRUE)
   anomaly_degree <- 0.5
   result <- anomaly_unique_value_count_relative(df_prep, anomaly_degree)
-  
+
   expect_true("method" %in% names(result))
   expect_equal(result$method[1], "unique_value_count_relative")
 })
 
-test_that("ctasval works correctly", {
+test_that("ctasval works correctly for ks scoring", {
   df_prep <- prep_sdtm_lb(lb, dm, scramble = TRUE)
 
   df_filt <- df_prep %>%
@@ -89,4 +89,48 @@ test_that("ctasval works correctly", {
   expect_true("result" %in% names(ctas))
   expect_true("anomaly" %in% names(ctas))
   expect_true("score" %in% colnames(ctas$anomaly))
+  expect_true("is_signal" %in% colnames(ctas$anomaly))
+
+})
+
+test_that("ctasval works correctly for mixedeffects scoring", {
+  df_prep <- prep_sdtm_lb(lb, dm, scramble = TRUE)
+
+  df_filt <- df_prep %>%
+    filter(parameter_id == "Alkaline Phosphatase")
+
+  ctas <- ctasval(
+    df = df_filt,
+    fun_anomaly = c(anomaly_average, anomaly_sd),
+    feats = c("average", "sd"),
+    parallel = FALSE,
+    iter = 1,
+    site_scoring_method = "mixedeffects"
+  )
+
+  expect_true("result" %in% names(ctas))
+  expect_true("anomaly" %in% names(ctas))
+  expect_true("score" %in% colnames(ctas$anomaly))
+  expect_true("is_signal" %in% colnames(ctas$anomaly))
+})
+
+test_that("ctasval works correctly for avg_feat_value scoring", {
+  df_prep <- prep_sdtm_lb(lb, dm, scramble = TRUE)
+
+  df_filt <- df_prep %>%
+    filter(parameter_id == "Alkaline Phosphatase")
+
+  ctas <- ctasval(
+    df = df_filt,
+    fun_anomaly = c(anomaly_average, anomaly_sd),
+    feats = c("average", "sd"),
+    parallel = FALSE,
+    iter = 1,
+    site_scoring_method = "avg_feat_value"
+  )
+
+  expect_true("result" %in% names(ctas))
+  expect_true("anomaly" %in% names(ctas))
+  expect_true("score" %in% colnames(ctas$anomaly))
+  expect_true("is_signal" %in% colnames(ctas$anomaly))
 })
