@@ -209,7 +209,8 @@ anomaly_range <- function(df, anomaly_degree, site = "sample_site") {
         .data$result),
       method = "range",
       .by = c("parameter_id")
-    )
+    ) %>%
+    select(- "add_outlier")
 
   return(sample_data)
 }
