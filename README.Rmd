@@ -77,10 +77,11 @@ ctas <- ctasval(
   ),
   feats = c("average", "sd", "autocorr", "lof", "range", "unique_value_count_relative"),
   parallel = TRUE,
-  iter = 100,
+  iter = 50,
   n_sites = 3,
-  anomaly_degree = c(0, 0.1, 0.25, 0.5, 1, 2, 5, 100),
-  thresh = 1
+  anomaly_degree = c(0, 0.25, 0.5, 0.75, 1, 5, 10),
+  thresh = 1.3,
+  site_scoring_method = "ks"
 )
 
 plan(sequential)
@@ -99,6 +100,79 @@ ctas$result %>%
   facet_grid(parameter_id ~ feats) +
   theme(legend.position = "bottom")
 ```
+
+
+### Mixed Effect Scoring
+
+```{r}
+plan(multisession, workers = 6)
+
+ctas <- ctasval(
+  df = df_filt,
+  fun_anomaly = c(
+    anomaly_average,
+    anomaly_sd,
+    anomaly_autocorr,
+    anomaly_lof,
+    anomaly_range,
+    anomaly_unique_value_count_relative
+  ),
+  feats = c("average", "sd", "autocorr", "lof", "range", "unique_value_count_relative"),
+  parallel = TRUE,
+  iter = 50,
+  n_sites = 3,
+  anomaly_degree = c(0, 0.25, 0.5, 0.75, 1, 5, 10),
+  thresh = 1.3,
+  site_scoring_method = "mixedeffects"
+)
+
+plan(sequential)
+
+ctas$result %>%
+  tidyr::pivot_longer(c(tpr, fpr), values_to = "metric", names_to = "metric_type") %>%
+  ggplot(aes(log(anomaly_degree),  metric)) +
+  geom_line(aes(linetype = metric_type)) +
+  geom_point() +
+  facet_grid(parameter_id ~ feats) +
+  theme(legend.position = "bottom")
+
+```
+
+### Average Box Plot Scoring
+
+```{r}
+plan(multisession, workers = 6)
+
+ctas <- ctasval(
+  df = df_filt,
+  fun_anomaly = c(
+    anomaly_average,
+    anomaly_sd,
+    anomaly_autocorr,
+    anomaly_lof,
+    anomaly_range,
+    anomaly_unique_value_count_relative
+  ),
+  feats = c("average", "sd", "autocorr", "lof", "range", "unique_value_count_relative"),
+  parallel = TRUE,
+  iter = 50,
+  n_sites = 3,
+  anomaly_degree = c(0, 0.25, 0.5, 0.75, 1, 5, 10),
+  site_scoring_method = "avg_feat_value"
+)
+
+plan(sequential)
+
+ctas$result %>%
+  tidyr::pivot_longer(c(tpr, fpr), values_to = "metric", names_to = "metric_type") %>%
+  ggplot(aes(log(anomaly_degree),  metric)) +
+  geom_line(aes(linetype = metric_type)) +
+  geom_point() +
+  facet_grid(parameter_id ~ feats) +
+  theme(legend.position = "bottom")
+
+```
+
 
 ### Anamolous Sites
 
