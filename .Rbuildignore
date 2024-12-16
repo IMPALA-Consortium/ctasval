@@ -7,3 +7,6 @@
 ^\.github$
 .Rhistory
 ^LICENSE\.md$
+^pub$
+^inst/pub/.quarto$
+^.quarto$

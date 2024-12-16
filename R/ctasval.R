@@ -247,7 +247,9 @@ get_ctas <- function(df, feats,
         by = c("site", "parameter_id")
       )
 
-  }
+  } else (
+    stop("invalid site_scoring_method")
+  )
 
 
 
@@ -397,6 +399,10 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
     df_ctas <- df_ctas %>%
       mutate(is_signal = ifelse(.data$score >= .env$thresh, 1, 0))
 
+  } else {
+    # for column consistency we add score to be the same as signal for average feature value method
+    df_ctas <- df_ctas %>%
+      mutate(score = .data$is_signal)
   }
 
   if (!is.null(thresh)) {

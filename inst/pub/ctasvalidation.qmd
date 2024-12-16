@@ -109,17 +109,54 @@ In addition to flagging sites, the results are valuable for identifying individu
 
 ## Validation
 
-To evaluate ctas performance for detecting sites with anomolus time series we selected data from two laboraty (Alanine Aminotransferase, Creatinine) and two vitals mesurements (Systolic Blood Pressure, Weight) from a clinical trial data set and reassigned all patients to different sites to eliminate any existing site-specific anomalies. For each anomaly in scope we applied a specific transformation with a given degree to the measurements of three randomly selected sites. (i) Autocorrelation was introduced by adding a sinus signal multiplied by the anomaly degree to the original values. (ii) The average was increased by adding the site mean multiplied by the anomaly degree to the original values. (iii) The local outlier factor for a site would be increased by transforming the data for each patient by a randomly chosen non-normal distribution. The anomaly degree would determine the ratio of affected patients. (iv) To simulate range outliers we added one outlier per patient. The extremity of the outlier is based on the anomaly degree. (v) The standard deviation is increased by adding the site mean multiplied with the anomaly degree to each observations and randomly applying a negative or positive fore-sign. (vi) The unique value count per site was increased by replacing a ratio of observations with the first observed value per patient. The ratio would be determined by the anomaly degree. The anomalies introduced are visualised in @fig-anomalies. 
+To evaluate ctas performance for detecting sites with anomolus time series we selected data from two laboraty (Alanine Aminotransferase, Creatinine) and two vitals mesurements (Systolic Blood Pressure, Weight) from a clinical trial data set and reassigned all patients to different sites to eliminate any existing site-specific anomalies. Further we removed data points from unscheduled visits and data from screen failed patients. In total 15 completed studies were selected from 3 different IMPALA members in triplicates with comparable patient and site number.
 
-Subsequently we tried to detect the three anomlous sites using different site scoring methods among the compliant sites in the study data set. This was repeated a 100 times and true positive rate (TPR) and false positive rate (FPR) were calculated using the combined results. In total 15 completed studies were selected from 3 different IMPALA members in triplicates with comparable patient and site number see @fig-results.
+For each anomaly in scope we applied a specific transformation with a given degree to the measurements of three randomly selected sites. (i) Autocorrelation was introduced by adding a sinus signal multiplied by the anomaly degree to the original values. (ii) The average was increased by adding the site mean multiplied by the anomaly degree to the original values. (iii) The local outlier factor for a site would be increased by transforming the data for each patient by a randomly chosen non-normal distribution. The anomaly degree would determine the ratio of affected patients. (iv) To simulate range outliers we added one outlier per patient. The extremity of the outlier is based on the anomaly degree. (v) The standard deviation is increased by adding the site mean multiplied with the anomaly degree to each observations and randomly applying a negative or positive fore-sign. (vi) The unique value count per site was increased by replacing a ratio of observations with the first observed value per patient. The ratio would be determined by the anomaly degree. The anomalies introduced are visualised in @fig-anomalies. 
 
-# Results and Discussion (required section)
-
-> The Results section should briefly present the experimental data in text, tables or figures. Tables and figures should not be described extensively in the text. The Discussion should focus on the interpretation and the significance of the findings with concise objective comments that describe their relation to other work in the area. It should not repeat information in the results.
+Subsequently we tried to detect the three anomlous sites using different site scoring methods among the compliant sites in the study data set. This was repeated a 100 times and true positive rate (TPR) and false positive rate (FPR) were calculated using the combined results. 
 
 
+# Results (required section)
+
+> The Results section should briefly present the experimental data in text, tables or figures. Tables and figures should not be described extensively in the text.
+
+We have tested three different scoring methods trying to detect 6 different types of site anomalies that were introduced with varying degrees to 15 study data sets donated by 3 different IMPALA members across 4 different timeseries metrics. The resulting average TPR and FPR with their respective standard deviations were plotted in @fig-results which shows that TPR are responsive to the degree of the anomlies that were introduced while FPR remain indifferent.
+
+We observe that the average method has the highest TPR detecting almost all high degree anomalies at the cost of having the highest FPR among the scoring methods that we tested. The ks method has the lowest FPR but also the lowest TPR. While the mixedeffects and the average method both are able to detect simpler high degree anomalies, such as anomalies increasing the site average, with relative certainty the ks method struggles to detect more than half of the sites with such high degree anomalies.
+
+> BK we need to see how this holds up, when adding more data.
+
+We do not observe strong differences between the timeseries metrics. Some of them are more suceptible to the introduction of the anomalies and tend to result in higher TPR at lower anomaly degrees. This is to be expected as the anomalies use multiplication of the existing measurement that are more sensitive to higher starting values. An exception is the weight metric for which ctase only reaches a TPR of less than 0.5 when trying to detect unique value outliers. 
+
+Autocorrelation and local outlier factor anomalies which are more complex than the other anomalies are also difficult to detect we bareley detected half of the outliers that were introduced.
+
+# Discussion (required section)
+
+> The Discussion should focus on the interpretation and the significance of the findings with concise objective comments that describe their relation to other work in the area. It should not repeat information in the results.
+
+Alltogether this evaluation of the ctas algorithm has shown that site-level timeseries anomalies can be detected by comparing summary statistics of individual timeseries from one site against those obtained from all other patients from the study. Of all site scoring methods tested the ks and the mixedeffects method have lower TPR than the simpler approach of using boxplot statistics on site average values to detect outlier. The ks method has the lowest TPR overall but fails to detect all anomalies introduced even whith very high anomaly deegrees. The ks method is a rank-based test and does not account for the magnitude of an observed difference between two groups. Therefore sites with less than three patients will never be assigned a low p-value and thus will never get detected as an anomolous site. The ratio of such small sites across all of the studies is roughly 20% which explains the lower TPR when using the ks method. Even though the mixedeffect model method can detect site-level anomalies for small sites the anomalies will need to be more extreme and we need to tolereate a higher level of noise as the FPR will increase. The ctas algorithm is targeted to detect systemic anomalies at site-level and not to detect outliers for individual patients, although they might contribute to a site's signal. We therefore recommend to also check for patient-level outliers using similarity plot as depicted in @fig-similarity-plot.
+
+> BK: Maybe we could have a paragraph discussing time series length here. But so far I do not understand it well myself. 
+
+While the number of patients at a site is an important factor that determines whether site anomalies can be statistically detected the length of the individual time series is also important.
+
+The explanation here is that the majority of the studies only measured weight during screening. For a timeseries of length one all patients will have a relative unique value count of 1.
+
+> BK Here we need to say something about the more complex anomalies lof and autocorr, not sure exactly yet what to say about autocorr
+
+Local outlier factor creates a multidimensional distance metric that is hard to emulate artificially. Nevertheless the approach to transform patients measurement by a random non-normal distribution could increase the distance of the anomolous site to the rest of the data set to some extend. And ctas was able to detect around 50% of the anomolous sites.
+
+Nevertheless all 6 summary metrics collected by ctas complement each other and any site-level anomaly will affect more than one metric.
 
 # Conclusion (required section)
+
+Current regulatory guidelines promote the use of risk based quality monitoring (RBQM) in clinical trials to support traditional onsite monitoring and medical review and data management. Most clinical trial data consist of repeated measurements taken of the same patients repetitavel over the duration of the trial. The integrity of these data points is mostly challenged by systemic errors introduced at site level which can have root causes such as: misinterpretation of the protocol, miscalibration of laboratory tests, inussficient staff training and many more. These errors will affect a larger portion of patients enrolled at the site and should be statistically detectable as site-level anomalies given that sufficient compliant data has been collected within the current trial data set. Classical risk mitigation strategies consist of a combination of monitoring activities such as source data verification (SDV) and source date review (SDR), programmed data management edit checks and medical data review. These activities are laboreous and ressource intensive and never cover the entire clinical data set. A risk- based framework targets these activities towards high risk areas such as critical data fields (e.g. clinical endpoints and safety data) and statistical outliers possibly indicating systemic site issues.
+
+We have demonstrated that the ctas algorithm can be used to detect site-level anomalies of various kinds and that it gets more accurrate the more extreme the anomalies are. Within an RBQM framework ctas can be used to screen a clinical data set for site anomalies and target those for manual data review. The higher the score the more likely a site is to represent a genuine outlier that can be confirmed in a time series data visualisation. As the algorithm can cover the entire clinical data set, complete blind spots in the risk mitigation strategy can be avoided. Possible unforeseen scenarios missed by first line control activities (programmed edit check) can be detected.
+
+Even though we have only tested ctas for the detection of anomolous sites for numerical time series data in this work, the statistics can also be used to detect patient-level outliers using the ctas statistics to create similarity plots. Further categorical variables can be transformed into a binary numerical representation and included in the outlier detection. Presently ctas requires multiple data preprocessing steps as well as a post reporting pipeline. Future development of ctas might provide a framework for those steps as well.
+
+
 
 > The conclusions section should highlight the main conclusion(s), stating the answer to the study objective. The Conclusions section should be a distinct section.
 
