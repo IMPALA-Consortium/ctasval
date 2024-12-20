@@ -69,7 +69,11 @@ The journal will publish 5-6 keywords. However, to ensure that your manuscript i
 
 > BK: IMPALA needs to be mentioned in abstract and introduction
 
-Ensuring the high quality of data is one of the main tasks of a clinical trial sponsor. This work is done when the study is on-going, and it is an absolute requirement for a solid safety and efficacy readout at the end of the study. If issues are identified early enough, the study site could be further trained to avoid problems later in the study. In the extreme case of fraud, a site can be completely excluded from the study to avoid bias in study results. There are various ways how sponsors try to ensure that the trial sites record results as defined in the trial protocol. Source data verification aims to catch transcription errors by comparing results in original documentation with what has been entered into the electronic data capture system. At central monitoring, protocol compliance is controlled to ensure that, for example, subject visits take place at correct intervals, or that inclusion and exclusion criteria have been met. Central statistical monitoring screens subject measurements (e.g., laboratory results or vital signs) for any anomalies such as individual measurement outliers. In this paper, we present an internally developed tool for the identification of anomalous time series collected during the study. Anomalous time series are monitored both on the level of an individual subject and a trial site. The rest of the paper describes how the time series are processed and analyzed. Examples of typical anomalies are also given.
+Ensuring the high quality of data is one of the main tasks of a clinical trial sponsor. This work is done when the study is on-going, and it is an absolute requirement for a solid safety and efficacy readout at the end of the study. If issues are identified early enough, the study site could be further trained to avoid problems later in the study. In the extreme case of fraud, a site can be completely excluded from the study to avoid bias in study results.
+
+There are various ways how sponsors try to ensure that the trial sites record results as defined in the trial protocol. Source data verification aims to catch transcription errors by comparing results in original documentation with what has been entered into the electronic data capture system. At central monitoring, protocol compliance is controlled to ensure that, for example, subject visits take place at correct intervals, or that inclusion and exclusion criteria have been met. Central statistical monitoring screens subject measurements (e.g., laboratory results or vital signs) for any anomalies such as individual measurement outliers.
+
+In this paper, we present an evaluation of CTAS (Clincical Trial Anomaly Spotter) - an open-source R package for the identification of anomalous time series collected during the study. The package was developed originally by Bayer, and later co-developed by the IMPALA consortium. Anomalous time series are monitored both on the level of an individual subject and a trial site. The rest of the paper describes how the time series are processed and analyzed with CTAS. Also an evaluation of the package's performance in picking anomalous data is presented using semi-synthetic clinical trial data sets. Examples of typical anomalies are also given.
 
 **Use for References Examples** Detecting anomalies in timeseries clinical trial data is a complex problem with no standard solution. @chandola_anomaly_2009
 
@@ -83,15 +87,35 @@ Here are some examples on fraud in clinical trials. @george_data_2015
 
 ### PROCESSING TIMESERIES
 
-The source of our clinical data is our harmonized clinical trial database Raven. It contains both clinical subject-level data and operational data for on-going Bayer studies. The following is an overview of how we define the time series of interest and how we process them. PARAMETERS Parameters from the following data domains are in scope: LB (laboratory measurements), EG (ECG parameters), VS (vital signs) and QS (patient questionnaires). We consider all parameters which fulfill the criteria for time series (see below) and make no distinction between critical and non-critical parameters. An alternative approach would have been to only include parameters deemed critical for safety and study endpoints. We decided not to do this because bias in non-critical parameters can be indicative of general misconduct at a site which might result in also the critical data being compromised. Further, each parameter is considered twice: once using the actual measurements and once with baseline-adjusted values. The latter can be interesting for identifying trend outliers.
+The starting point of CTAS is a set of clinical trial data. The first step the user must make is to transform the data into the format accepted by CTAS. Details on the CTAS data format is described at the project Github repository.
+
+The user is free to include data from any data domain as long as the data is continuous. It is also left to the discretion of the user to either only analyze study critical parameters such as those related to safety and end points or to search for anomalies in all numerical data collected within the study.
+
+The CTAS input arguments give the user plenty of flexibility in defining time points that constitute a time series. Alternative the package can be given the freedom of defining time series in a data-driven manner. Additionally, the arguments can be used to restrict the time series features calculated (see below more on these) and choose the site-scoring method (also, see below).
 
 #### DEFINING TIME SERIES
 
-For each parameter, one or more time series can be defined. A time series must have at least three time points and there must be at least 30 subjects with data for all time points. Subjects with missing data in more than a third of the time points are excluded. In an on-going study, some subjects might have only taken the first visits while some have already finished the study. This is the reason why we might define more than one time series per parameter. For example, one time series would include almost all planned time points and would be useful for comparing sites and subjects which have largely finished the trial. Another time series might focus on the first few visits to also include subjects which have only lately been enrolled. @fig-timeseries-def gives a simplified example of a set of two time series defined for a parameter.
+By default, a time series must have at least three time points, there must be at least three eligible subjects per time series, and a subject can have at most half of time points missing. These parameters can of course be changed by the user to fit the characteristics of the trial better.
+
+The user can also have baseline-adjusted time series generated if baseline values are defined.
+
+In an on-going study, some subjects might have only taken the first visits while some have already finished the study. This is the reason why more than one time series per parameter can be defined. For example, one time series would include almost all planned time points and would be useful for comparing sites and subjects which have largely finished the trial. Another time series might focus on the first few visits to also include subjects which have only lately been enrolled. @fig-timeseries-def gives a simplified example of a set of two time series defined for a parameter.
 
 #### TIME SERIES FEATURES
 
-A set of features is calculated for each time series. The features Mean, Standard deviation and Unique value count are very simple and require no further explanation here. Autocorrelation is calculated with a lag of one timepoint and values close to minus one pinpoint to a zig-zagging behavior in the time series. @fig-timeseries-feats illustrates the features for a sample time series.
+Each time series is characterized by set of time series features. These features are central to the algorithm as they are used to flag anomalous sites (see below). In addition, the features can be used to identify individual subjects with peculiar time series. Currently available time series features are listed in the table below. For an illustration of features for a time series, please see @fig-timeseries-feats.
+
+| Feature code | Description |
+|------------------------|-----------------------------------------------|
+| autocorr | Auto-correlation |
+| average | Average value |
+| own_site_simil_score | Measure of co-clustering of time series from the same study site |
+| sd | Standard deviation |
+| unique_value_count_relative | Number of unique values divided by number of values available |
+| range | Maximum difference between two time points in a series |
+| lof | Local Outlier Factor. Values around one are inliers while the larger the value, more of an outlier the timeseries is. |
+
+: List of time series features
 
 ### FLAGGING SITES
 
