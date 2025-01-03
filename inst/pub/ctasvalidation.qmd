@@ -56,28 +56,40 @@ for references add the doi link, I will add those to the `ctas.bib` file.
 > The running head for a manuscript will be the shortened manuscript title followed by an ellipsis.
 
 ## Abstract
+> structured abstract (Abstract should not exceed 250 words.), now 250 words
 
-Correcting errors in clinical trial data as the trial is on-going is vital for an accurate safety and efficacy read-out. In this talk, we will show how time series can be used to identify trial sites and individual subjects with potential errors in their clinical parameters (e.g., vital signs or laboratory measurements). Each subject-level time series is summarized as scalars such as mean and entropy. These features alone are useful in identifying individual subjects with suspicious data. Furthermore, trial sites with systematic bias in their data are flagged (for example, all albumin measurements at a site might have a growing trend while there is no trend at the study level). Results of the algorithm are available to anyone in our development organization who are involved in ensuring the quality of our trial data. Actions resulting from the results can range from sending queries to planning complete study audits.
+### Background
+
+Current ICH guidelines advocate a risk-based statistical review of clinical trial data to identify anomalies. The open source R package, clinical trial anomaly spotter (CTAS) has been developed by Bayer and the intercompany quality analytics (IMPALA), helps detect inconsistencies in subject time series data at both site and subject levels, facilitating timely intervention.
+
+### Methods
+CTAS analyzes time series of equal length. Each subject-level time series is summarized as six optional scalars mean, standard deviation, range, relative unique value count, autocorrelation and local outlier factor. To detect site-level anomalies sites can be scored using 3 different scoring methods. The performance of the CTAS algorithm was tested using simulations, artificially introducing site anomalies of varying types and degrees into clinical trial data sets.
+
+### Results
+We find that CTAS can reliably detect site anomalies depending on the degree of the anomaly introduced. Less complex anomalies such as mean were easier to detect than complex outlier such as local outlier factor. The three scoring methods differed in their ability to detect anomalous sites with a small number of patients and their false positive rate.
+
+### Conclusions
+CTAS is a valuable tool for early detection of outliers in clinical data monitoring, suitable for integration into risk-based strategies. Choosing the appropriate site anomaly scoring method is crucial for handling sites with fewer subjects effectively.
+
 
 # Keywords (required section)
 
-The journal will publish 5-6 keywords. However, to ensure that your manuscript is easily searchable in PubMed and other repositories, be sure to include any relevant keywords in the title or abstract of your manuscript.
+RBQM, SDM, time series, anomaly, clinical trial, outlier
+
+> The journal will publish 5-6 keywords. However, to ensure that your manuscript is easily searchable in PubMed and other repositories, be sure to include any relevant keywords in the title or abstract of your manuscript.
 
 # Introduction (required section)
 
 > The introduction should assume that the reader is knowledgeable in the field and should therefore be brief; it can include a short historical review where desirable. It should also include the study objective.
 
-> BK: IMPALA needs to be mentioned in abstract and introduction
 
-Ensuring the high quality of data is one of the main tasks of a clinical trial sponsor. This work is done when the study is on-going, and it is an absolute requirement for a solid safety and efficacy readout at the end of the study. If issues are identified early enough, the study site could be further trained to avoid problems later in the study. In the extreme case of fraud, a site can be completely excluded from the study to avoid bias in study results.
+Ensuring the high quality of data is a major resonpsibility of the clinical trial sponsor. In addition to traditional control strategies such as: source data verification and review, monitoring visits and investigator site audits, current ICH guidelines recommended a risk-based statistical approach to monitor the completeness, expected range and variablity of the clinical trial data @noauthor_ich_1997 So called central monitoring activities are part of the risk-based quality monitoring (RBQM) framework one of which is statistical data monitoring (SDM).
 
-There are various ways how sponsors try to ensure that the trial sites record results as defined in the trial protocol. Source data verification aims to catch transcription errors by comparing results in original documentation with what has been entered into the electronic data capture system. At central monitoring, protocol compliance is controlled to ensure that, for example, subject visits take place at correct intervals, or that inclusion and exclusion criteria have been met. Central statistical monitoring screens subject measurements (e.g., laboratory results or vital signs) for any anomalies such as individual measurement outliers.
+Subject-level data in clinical trial can be collected as categorical, ordinal or numerical data as a single measurement or as a timeseries. Classically all of these data types require different statistical tests. Consequently, statistical data monitoring tools execute a myriad of test @venet_statistical_2012, @kirkwood_application_2013, @trotta_detection_2019 and it has been shown that the application of such tools can improve data quality over time @de_viron_does_2024 Recently an RBQM open source solution focusing on the monitoring of site key risk indicators (KRI) has been published @wu_good_2024 but presently, no open source solution has been published aggregating central data monitoring methods into one tool.
 
-In this paper, we present an evaluation of CTAS (Clincical Trial Anomaly Spotter) - an open-source R package for the identification of anomalous time series collected during the study. The package was developed originally by Bayer, and later co-developed by the IMPALA consortium. Anomalous time series are monitored both on the level of an individual subject and a trial site. The rest of the paper describes how the time series are processed and analyzed with CTAS. Also an evaluation of the package's performance in picking anomalous data is presented using semi-synthetic clinical trial data sets. Examples of typical anomalies are also given.
+In this paper, we present an evaluation of Clincical Trial Anomaly Spotter (CTAS) - an open-source R package for the identification of anomalous time series collected during the study. The package was developed originally by Bayer, and later co-developed by the Intercompany Quality Analytics (IMPALA) consortium. Anomalous time series are monitored both on the level of an individual subject and a trial site. CTAS fills the statistical data monitoring gap of the current open source RBQM landscape. It has foremost been developed for the detection of anomalies in numerical time series data but with adequate data preprocessing it can be repurposed for categorical data as well. As CTAS puts a strong focus on timeseries data it ensures that only timeseries of the same length are being compared supressing false positive signals.
 
-**Use for References Examples** Detecting anomalies in timeseries clinical trial data is a complex problem with no standard solution. @chandola_anomaly_2009
-
-Here are some examples on fraud in clinical trials. @george_data_2015
+Here we demonstrate the efficiency of detecing anomolous sites using simulations based on data from 15 clinical trials donated from 3 of the IMPALA member companies.
 
 # Methods (required section)
 
@@ -174,7 +186,7 @@ Nevertheless all 6 summary metrics collected by ctas complement each other and a
 
 # Conclusion (required section)
 
-Current regulatory guidelines promote the use of risk based quality monitoring (RBQM) in clinical trials to support traditional onsite monitoring and medical review and data management. Most clinical trial data consist of repeated measurements taken of the same patients repetitavel over the duration of the trial. The integrity of these data points is mostly challenged by systemic errors introduced at site level which can have root causes such as: misinterpretation of the protocol, miscalibration of laboratory tests, inussficient staff training and many more. These errors will affect a larger portion of patients enrolled at the site and should be statistically detectable as site-level anomalies given that sufficient compliant data has been collected within the current trial data set. Classical risk mitigation strategies consist of a combination of monitoring activities such as source data verification (SDV) and source date review (SDR), programmed data management edit checks and medical data review. These activities are laboreous and ressource intensive and never cover the entire clinical data set. A risk- based framework targets these activities towards high risk areas such as critical data fields (e.g. clinical endpoints and safety data) and statistical outliers possibly indicating systemic site issues.
+Current regulatory guidelines promote the use of risk based quality monitoring (RBQM) in clinical trials to support traditional onsite monitoring and medical review and data management. Most clinical trial data consist of repeated measurements taken of the same patients repetitevely over the duration of the trial. The integrity of these data points is mostly challenged by systemic errors introduced at site level which can have root causes such as: misinterpretation of the protocol, miscalibration of laboratory tests, inussficient staff training and many more. These errors will affect a larger portion of patients enrolled at the site and should be statistically detectable as site-level anomalies given that sufficient compliant data has been collected within the current trial data set. Classical risk mitigation strategies consist of a combination of monitoring activities such as source data verification (SDV) and source date review (SDR), programmed data management edit checks and medical data review. These activities are laboreous and ressource intensive and never cover the entire clinical data set. A risk- based framework targets these activities towards high risk areas such as critical data fields (e.g. clinical endpoints and safety data) and statistical outliers possibly indicating systemic site issues.
 
 We have demonstrated that the ctas algorithm can be used to detect site-level anomalies of various kinds and that it gets more accurrate the more extreme the anomalies are. Within an RBQM framework ctas can be used to screen a clinical data set for site anomalies and target those for manual data review. The higher the score the more likely a site is to represent a genuine outlier that can be confirmed in a time series data visualisation. As the algorithm can cover the entire clinical data set, complete blind spots in the risk mitigation strategy can be avoided. Possible unforeseen scenarios missed by first line control activities (programmed edit check) can be detected.
 
