@@ -2,7 +2,7 @@ pandoc: 3.1.11
 pkgdown: 2.1.1
 pkgdown_sha: ~
 articles: {}
-last_built: 2024-12-20T14:07Z
+last_built: 2025-01-05T20:25Z
 urls:
   reference: https://impala-consortium.github.io/ctasval/reference
   article: https://impala-consortium.github.io/ctasval/articles
