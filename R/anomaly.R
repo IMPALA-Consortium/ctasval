@@ -65,7 +65,7 @@ anomaly_sd <- function(df, anomaly_degree, site = "sample_site") {
       method = "sd",
       .by = c("parameter_id", "subject_id")
     ) %>%
-    select(-.data$rbin)
+    select(- "rbin")
 
   return(sample_data)
 }
@@ -101,7 +101,7 @@ anomaly_autocorr <- function(df, anomaly_degree, site = "sample_site") {
       result = .data$result + anomaly_degree * .data$sin_param,
       method = "autocorr"
     ) %>%
-    select(-.data$sin_param)
+    select(- "sin_param")
 
   return(sample_data)
 }
@@ -158,7 +158,7 @@ anomaly_lof <- function(df, anomaly_degree, site = "sample_site", verbose = FALS
       ),
       method = "lof"
     ) %>%
-    select(-.data$surprise)
+    select(- "surprise")
 
   return(sample_data)
 }
@@ -311,7 +311,7 @@ anomaly_unique_value_count_relative <- function(df, anomaly_degree, site = "samp
       result = ifelse(runif(1) < anomaly_degree_to_prop(.env$anomaly_degree), .data$first_timepoint_result, .data$result),
       method = "unique_value_count_relative"
     ) %>%
-    select(-.data$first_timepoint_result)
+    select(- "first_timepoint_result")
 
 
   return(sample_data)

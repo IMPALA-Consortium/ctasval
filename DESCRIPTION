@@ -1,6 +1,6 @@
 Package: ctasval
 Title: Validate ctas
-Version: 0.0.3
+Version: 0.0.4
 Authors@R: c(
   person("Björn", "Koneswarakantha",
     role = c("aut", "cre"),
