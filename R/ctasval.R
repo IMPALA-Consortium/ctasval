@@ -195,63 +195,46 @@ get_ctas <- function(df, feats,
     data_ctas_prep <- ls_ctas$site_scores %>%
       left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
       summarise(
-        score = max(.data$fdr_corrected_pvalue_logp),
+        score = max(.data$fdr_corrected_pvalue_logp, na.rm = TRUE),
         .by = c("site", "parameter_id")
       )
 
-    data_ctas <- df %>%
-      distinct(.data$site, .data$parameter_id) %>%
-      left_join(
-        data_ctas_prep,
-        by = c("site", "parameter_id")
-      ) %>%
-      mutate(
-        score = ifelse(is.na(.data$score), 0, .data$score)
-      )
+  } else if(site_scoring_method == "mixedeffects") {
 
-     } else if(site_scoring_method == "mixedeffects") {
-
+    #mixed effect return all NaN for some sites, we muffle the warning
+    suppressWarnings(
       data_ctas_prep <- ls_ctas$site_scores %>%
         rename(site = "entity") %>%
         left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
         summarise(
-          score = max(.data$fdr_corrected_pvalue_logp),
+          score = max(.data$fdr_corrected_pvalue_logp, na.rm = TRUE),
           .by = c("site", "parameter_id")
         )
+    )
 
-      data_ctas <- df %>%
-        distinct(.data$site, .data$parameter_id) %>%
-        left_join(
-          data_ctas_prep,
-          by = c("site", "parameter_id")
-        ) %>%
-        mutate(
-          score = ifelse(is.na(.data$score), 0, .data$score)
-        )
-
-    } else if(site_scoring_method == "avg_feat_value") {
+  } else if(site_scoring_method == "avg_feat_value") {
 
     data_ctas_prep <- ls_ctas$site_scores %>%
       rename(site = "entity") %>%
       ungroup() %>%
       left_join(ls_ctas$timeseries, by = "timeseries_id") %>%
       summarise(
-        is_signal = max(.data$is_signal),
+        is_signal = max(.data$is_signal, na.rm = TRUE),
         .by = c("site", "parameter_id")
-      )
-
-    data_ctas <- df %>%
-      distinct(.data$site, .data$parameter_id) %>%
-      left_join(
-        data_ctas_prep,
-        by = c("site", "parameter_id")
       )
 
   } else (
     stop("invalid site_scoring_method")
   )
 
-
+  # we join ctas results with original sites to make sure all sites
+  # are included in the final result, we delibarately leave them at NA
+  data_ctas <- df %>%
+    distinct(.data$site, .data$parameter_id) %>%
+    left_join(
+      data_ctas_prep,
+      by = c("site", "parameter_id")
+    )
 
   return(data_ctas)
 }
@@ -412,8 +395,10 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
         classification =
 
             case_when(
-              .data$is_P & .data$is_signal == 1 ~ "TP",
+              .data$is_P & is.na(.data$is_signal) ~ "FN",
+              is.na(.data$is_signal) ~ "TN",
               .data$is_P & .data$is_signal == 0 ~ "FN",
+              .data$is_P & .data$is_signal == 1 ~ "TP",
               .data$is_signal == 1 ~ "FP",
               TRUE ~ "TN"
             ),
