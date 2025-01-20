@@ -128,7 +128,7 @@ Each time series is characterized by a set of time series features. These featur
 | sd                          | Standard deviation                                                                                                    |
 | unique_value_count_relative | Number of unique values divided by number of values available                                                         |
 | range                       | Maximum difference between two time points in a series                                                                |
-| lof                         | Local Outlier Factor. Values around one are inliers while the larger the value, more of an outlier the timeseries is. |
+| lof                         | Local Outlier Factor. Values around one are inliers while the larger the value, more of an outlier the timeseries is. @breunig_lof_2000 |
 
 : List of time series features
 
@@ -142,7 +142,7 @@ Sites are flagged based on the bias in their time series feature values versus o
 
 #### Kolmogorov-Smirnov
 
-The Kolmogorov-Smirnov (K-S) statistical test compares time series feature values of individual sites against the combined values from all other sites. This non-parametric test evaluates the null hypothesis that the feature values from a specific site and the feature values from all other sites are drawn from the same distribution.
+The Kolmogorov-Smirnov (K-S) statistical test compares time series feature values of individual sites against the combined values from all other sites. This non-parametric test evaluates the null hypothesis that the feature values from a specific site and the feature values from all other sites are drawn from the same distribution. @schroer_exact_1995
 
 The K-S test calculates the maximum difference between the empirical cumulative distribution functions (ECDFs) of the two samples, providing a D-statistic and a p-value for each comparison. The p-value indicates the significance of the difference between the distributions. A low p-value suggests that the feature values from the site are significantly different to those from other sites, potentially indicating an anomaly.
 
