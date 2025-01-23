@@ -69,7 +69,7 @@ ctas <- ctasval(
   fun_anomaly = c(
     anomaly_average,
     anomaly_sd,
-    anomaly_autocorr,
+    anomaly_autocorr2,
     anomaly_lof,
     anomaly_range,
     anomaly_unique_value_count_relative
@@ -1535,58 +1535,58 @@ ctas$anomaly %>%
   knitr::kable()
 ```
 
-| iter | anomaly_degree | feats    | parameter_id             | site         | subject_id               | timepoint_rank |      result | score |
-|-----:|---------------:|:---------|:-------------------------|:-------------|:-------------------------|---------------:|------------:|------:|
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1335 |              1 |  173.990697 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1335 |              4 |  179.241848 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1335 |              5 |   50.489801 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1335 |              7 | -119.697451 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |              1 | -154.205697 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |              4 |  -23.469424 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |              5 |  134.668204 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |              7 |  194.702833 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |              8 |   92.438901 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |              9 |  -81.263813 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |             10 | -166.623231 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |             11 |  -81.918483 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |             12 |   87.892671 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 |             13 |  191.928454 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |              1 |  129.458241 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |              4 |  -37.002537 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |              5 | -159.652422 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |              7 | -119.647071 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |              8 |   43.071571 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |              9 |  179.900736 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |             10 |  168.120925 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |             11 |   14.401232 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |             12 | -133.848560 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 |             13 | -148.570092 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 |              1 |   -5.906035 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 |              4 |  165.737120 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 |              5 |  191.745402 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 |              7 |   81.932358 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 |              8 |  -91.868870 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 |              9 | -160.463212 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 |             10 |  -58.979300 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 |             11 |  118.601444 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |              1 |  140.816445 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |              4 |  148.796621 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |              5 |   34.764801 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |              7 |  -99.358081 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |              8 | -122.098858 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |              9 |  -27.113995 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |             10 |  109.670885 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |             11 |  160.576999 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |             12 |   79.640291 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 |             13 |  -64.048821 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 |              1 | -134.141416 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 |              4 |  -64.952872 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 |              5 |   73.824578 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 |              7 |  158.760797 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 |              8 |  110.685211 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 |              9 |  -30.362917 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 |             10 | -124.462774 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 |             11 |  -92.502409 |     1 |
+| iter | anomaly_degree | feats | parameter_id | site | subject_id | timepoint_rank | result | score |
+|---:|---:|:---|:---|:---|:---|---:|---:|---:|
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1335 | 1 | 173.990697 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1335 | 4 | 179.241848 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1335 | 5 | 50.489801 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-703-1335 | 7 | -119.697451 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 1 | -154.205697 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 4 | -23.469424 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 5 | 134.668204 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 7 | 194.702833 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 8 | 92.438901 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 9 | -81.263813 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 10 | -166.623231 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 11 | -81.918483 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 12 | 87.892671 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-710-1235 | 13 | 191.928454 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 1 | 129.458241 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 4 | -37.002537 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 5 | -159.652422 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 7 | -119.647071 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 8 | 43.071571 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 9 | 179.900736 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 10 | 168.120925 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 11 | 14.401232 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 12 | -133.848560 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-715-1085 | 13 | -148.570092 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 | 1 | -5.906035 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 | 4 | 165.737120 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 | 5 | 191.745402 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 | 7 | 81.932358 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 | 8 | -91.868870 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 | 9 | -160.463212 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 | 10 | -58.979300 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-716-1189 | 11 | 118.601444 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 1 | 140.816445 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 4 | 148.796621 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 5 | 34.764801 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 7 | -99.358081 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 8 | -122.098858 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 9 | -27.113995 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 10 | 109.670885 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 11 | 160.576999 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 12 | 79.640291 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1192 | 13 | -64.048821 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 | 1 | -134.141416 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 | 4 | -64.952872 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 | 5 | 73.824578 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 | 7 | 158.760797 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 | 8 | 110.685211 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 | 9 | -30.362917 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 | 10 | -124.462774 | 1 |
+| 1 | 10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-708-1171 | 11 | -92.502409 | 1 |
 
 ## Publication
 

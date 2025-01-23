@@ -106,6 +106,63 @@ anomaly_autocorr <- function(df, anomaly_degree, site = "sample_site") {
   return(sample_data)
 }
 
+#' Autocorrelation CumSum
+#' @details Here we add fractions of the lag to the result. The fraction is determined by the anomaly_degree.
+#' @rdname anomaly
+#' @export
+#' @examples
+#' set.seed(1)
+#' library(ggplot2)
+#'
+#' df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
+#'
+#' df_filt <- df_prep %>%
+#'   filter(parameter_id == "Alkaline Phosphatase")
+#'
+#'df_anomaly <- anomaly_autocorr2(df_filt, anomaly_degree = 1, site = "anomolous")
+#'
+#'ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
+#' geom_line(color = "black") +
+#' geom_line(data = df_anomaly, color = "tomato") +
+#' coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
+#'
+anomaly_autocorr2 <- function(df, anomaly_degree, site = "sample_site") {
+  sample_data <- sample_site(df, site) %>%
+    mutate(
+      result = cumsum_fraction(.data$result, .env$anomaly_degree),
+      method = "autocorr",
+      .by = c("parameter_id", "subject_id")
+    )
+
+  return(sample_data)
+}
+
+#' Add a fraction of lag to vector
+#' @keywords internal
+#' @examples
+#' \dontrun{
+#' cumsum_fraction(rnorm(10), 0.5)
+#' cumsum_fraction(rnorm(1), 0.1)
+#'}
+cumsum_fraction <- function(x, fraction) {
+
+  if (length(x) == 1) {
+    return(x)
+  }
+
+  # Initialize the result vector with the same length as input
+  result <- numeric(length(x))
+  # Set the first element of result to be the first element of x
+  result[1] <- x[1]
+
+  # Loop through the input vector starting from the second element
+  for (i in 2:length(x)) {
+    # Each element is the sum of the current element and a fraction of the previous result
+    result[i] <- x[i] + (fraction * result[i - 1])
+  }
+
+  return(result)
+}
 
 #' lof
 #'

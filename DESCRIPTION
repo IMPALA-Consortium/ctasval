@@ -1,6 +1,6 @@
 Package: ctasval
 Title: Validate ctas
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: c(
   person("Björn", "Koneswarakantha",
     role = c("aut", "cre"),
@@ -33,5 +33,8 @@ Suggests:
     pharmaversesdtm,
     testthat (>= 3.0.0),
     ggplot2,
-    pkgdown
+    pkgdown,
+    knitr,
+    rmarkdown
 Config/testthat/edition: 3
+VignetteBuilder: knitr

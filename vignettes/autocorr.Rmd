@@ -1,0 +1,127 @@
+---
+title: "autocorr"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{autocorr}
+  %\VignetteEncoding{UTF-8}
+  %\VignetteEngine{knitr::rmarkdown}
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+library(ctasval)
+library(ggplot2)
+library(tidyr)
+```
+
+# Comparing Different Approaches for Introducing Autocorrelation to Clinical Measurements
+
+- `anomaly_autocorr` uses a sinus function
+- `anomaly_autocorr2` always adds a fraction of the lag value to the current value
+
+```{r}
+
+df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
+
+df_filt <- df_prep %>%
+ filter(parameter_id == "Alkaline Phosphatase")
+
+# with this wrapper functions will always generate an anomalous site with the same patients
+set_seed <- function(fun, seed = 1){
+  fun_seeded <- function(...) {
+    set.seed(seed)
+    fun(...)
+  }
+}
+
+
+plot_anomaly <- function(df, fun, anomaly_degree, seed) {
+  fun_seeded <- set_seed(fun, seed)
+  df_anomaly <- fun_seeded(df, anomaly_degree = anomaly_degree)
+  
+  ggplot(df, aes(x = timepoint_rank, y = result, group = subject_id)) +
+    geom_line(color = "black") +
+    geom_line(data = df_anomaly, color = "tomato") +
+    coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
+}
+
+plot_anomaly(df_filt, anomaly_autocorr, anomaly_degree = 0.7, seed = 3)
+plot_anomaly(df_filt, anomaly_autocorr2, anomaly_degree = 0.7, seed = 3)
+
+```
+
+# Compare Autocorrelation Values
+
+```{r}
+get_autocorr <- function(df, fun, anomaly_degree) {
+  fun_seeded <- set_seed(fun)
+  df_anomaly <- fun_seeded(df, anomaly_degree = anomaly_degree)
+  
+  df_anomaly %>%
+    filter(! is.na(result)) %>%
+    summarise(
+      autocorr = ctas:::calculate_autocorrelation(result),
+      n = n(),
+      .by = subject_id
+    ) %>%
+    mutate(
+      autocorr = ifelse(n <= 2, 0, autocorr)
+    )
+}
+
+get_autocorr(df_filt, anomaly_autocorr, anomaly_degree = 0.7)
+```
+
+```{r}
+df_grid <- tibble(
+    anomaly_degree = list(seq(0, 1, 0.1)),
+    fun = list(anomaly_autocorr, anomaly_autocorr2),
+    fun_name = c("anomaly_autocorr", "anomaly_autocorr2")
+  ) %>%
+  unnest(anomaly_degree)
+
+df_autocorr <- df_grid %>%
+  mutate(
+    autocorr = purrr::map2(fun, anomaly_degree, ~ get_autocorr(df_filt, .x, .y))
+  ) %>%
+  unnest(autocorr)
+```
+
+```{r fig.height=5, fig.width=7}
+df_autocorr %>%
+  ggplot(aes(as.factor(anomaly_degree), autocorr, fill = fun_name)) +
+  geom_boxplot() +
+  theme(legend.position = "bottom")
+```
+
+# Conclusion
+
+`anomaly_autocorr2` which adds a fraction of the previous values increases the autocorrelation more than `anomaly_autocorr` which uses a sinus function. 
+
+`ctas:::calculate_autocorrelation` only uses lag 1. To detect autocorrelation induced by the sinus function other lags would need to be considered.
+
+## Autocorrelation of a Sinus Function considering lag 1 to 9
+
+```{r}
+acf(sin(seq(1:10)))
+```
+
+## Autocorrelation of a random patient for Alkaline Phosphatase measurements considering lag 1 to 9
+
+```{r}
+df_filt %>%
+  filter(dense_rank(subject_id) == 1) %>%
+  pull(result) %>%
+  acf
+```
+
+
+

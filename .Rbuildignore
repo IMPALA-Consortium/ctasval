@@ -10,3 +10,5 @@
 ^pub$
 ^inst/pub/.quarto$
 ^.quarto$
+^.+\.csv$
+^[^/]+\.html$
