@@ -28,7 +28,7 @@ library(tidyr)
 - `anomaly_autocorr2` always adds a fraction of the lag value to the current value
 
 ```{r}
-
+set.seed(123)
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
 df_filt <- df_prep %>%
