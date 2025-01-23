@@ -102,11 +102,7 @@ df_autocorr %>%
   theme(legend.position = "bottom")
 ```
 
-# Conclusion
-
-`anomaly_autocorr2` which adds a fraction of the previous values increases the autocorrelation more than `anomaly_autocorr` which uses a sinus function. 
-
-`ctas:::calculate_autocorrelation` only uses lag 1. To detect autocorrelation induced by the sinus function other lags would need to be considered.
+# Autocorrelation of a Sinus Function
 
 ## Autocorrelation of a Sinus Function considering lag 1 to 9
 
@@ -124,4 +120,21 @@ df_filt %>%
 ```
 
 
+## Autocorrelation of a random patient for Alkaline Phosphatase measurements considering lag 1 to 9
+
+```{r}
+fun <- set_seed(anomaly_autocorr, seed = 10)
+fun(df_filt, anomaly_degree = 10) %>%
+  filter(dense_rank(subject_id) == 1) %>%
+  pull(result) %>%
+  acf
+```
+
+
+
+# Conclusion
+
+`anomaly_autocorr2` which adds a fraction of the previous values increases the autocorrelation more than `anomaly_autocorr` which uses a sinus function. 
+
+`ctas:::calculate_autocorrelation` only uses lag 1. Even when considering other lags a sinus function will not increase the autocorrelation above ~ 0.6
 
