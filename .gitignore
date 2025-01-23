@@ -8,3 +8,4 @@ docs
 inst/pub/*.html
 inst/pub/*.docx
 /pub/
+inst/doc

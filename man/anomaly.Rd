@@ -4,6 +4,7 @@
 \alias{anomaly_average}
 \alias{anomaly_sd}
 \alias{anomaly_autocorr}
+\alias{anomaly_autocorr2}
 \alias{anomaly_lof}
 \alias{anomaly_range}
 \alias{anomaly_unique_value_count_relative}
@@ -14,6 +15,8 @@ anomaly_average(df, anomaly_degree, site = "sample_site")
 anomaly_sd(df, anomaly_degree, site = "sample_site")
 
 anomaly_autocorr(df, anomaly_degree, site = "sample_site")
+
+anomaly_autocorr2(df, anomaly_degree, site = "sample_site")
 
 anomaly_lof(df, anomaly_degree, site = "sample_site", verbose = FALSE)
 
@@ -35,6 +38,9 @@ A data frame with added anomalies.
 }
 \description{
 Average
+}
+\details{
+Here we add fractions of the lag to the result. The fraction is determined by the anomaly_degree.
 }
 \examples{
 set.seed(1)
@@ -76,6 +82,21 @@ df_filt <- df_prep \%>\%
   filter(parameter_id == "Alkaline Phosphatase")
 
 df_anomaly <- anomaly_autocorr(df_filt, anomaly_degree = 2, site = "anomolous")
+
+ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
+geom_line(color = "black") +
+geom_line(data = df_anomaly, color = "tomato") +
+coord_cartesian(xlim = c(0, max(df_anomaly$timepoint_rank)))
+
+set.seed(1)
+library(ggplot2)
+
+df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
+
+df_filt <- df_prep \%>\%
+  filter(parameter_id == "Alkaline Phosphatase")
+
+df_anomaly <- anomaly_autocorr2(df_filt, anomaly_degree = 1, site = "anomolous")
 
 ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
 geom_line(color = "black") +

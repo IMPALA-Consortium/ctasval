@@ -45,6 +45,15 @@ test_that("anomaly_autocorr works correctly", {
   expect_equal(result$method[1], "autocorr")
 })
 
+test_that("anomaly_autocorr2 works correctly", {
+  df_prep <- prep_sdtm_lb(lb, dm, scramble = TRUE)
+  anomaly_degree <- 0.5
+  result <- anomaly_autocorr2(df_prep, anomaly_degree)
+
+  expect_true("method" %in% names(result))
+  expect_equal(result$method[1], "autocorr")
+})
+
 test_that("anomaly_lof works correctly", {
   df_prep <- prep_sdtm_lb(lb, dm, scramble = TRUE)
   anomaly_degree <- 0.5
