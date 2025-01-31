@@ -70,7 +70,7 @@ ctas <- ctasval(
   fun_anomaly = c(
     anomaly_average,
     anomaly_sd,
-    anomaly_autocorr,
+    anomaly_autocorr2,
     anomaly_lof,
     anomaly_range,
     anomaly_unique_value_count_relative
