@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ctasval</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.4</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -32,6 +32,12 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="reference/index.html">Reference</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
+<li><a class="dropdown-item" href="articles/autocorr.html">autocorr</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav"></ul>
 </div>
@@ -99,7 +105,7 @@
 <span>  fun_anomaly <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span></span>
 <span>    <span class="va">anomaly_average</span>,</span>
 <span>    <span class="va">anomaly_sd</span>,</span>
-<span>    <span class="va">anomaly_autocorr</span>,</span>
+<span>    <span class="va">anomaly_autocorr2</span>,</span>
 <span>    <span class="va">anomaly_lof</span>,</span>
 <span>    <span class="va">anomaly_range</span>,</span>
 <span>    <span class="va">anomaly_unique_value_count_relative</span></span>
@@ -1558,17 +1564,17 @@
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">iter</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">anomaly_degree</span><span class="op">)</span>, <span class="va">parameter_id</span>, <span class="va">feats</span>, <span class="va">site</span>, <span class="va">subject_id</span>, <span class="va">timepoint_rank</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="4%">
 <col width="11%">
-<col width="7%">
-<col width="19%">
-<col width="10%">
-<col width="19%">
 <col width="11%">
-<col width="9%">
-<col width="5%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
 </colgroup>
 <thead><tr class="header">
 <th align="right">iter</th>

@@ -2,11 +2,14 @@
 <url><loc>https://impala-consortium.github.io/ctasval/404.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/LICENSE-text.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/LICENSE.html</loc></url>
+<url><loc>https://impala-consortium.github.io/ctasval/articles/autocorr.html</loc></url>
+<url><loc>https://impala-consortium.github.io/ctasval/articles/index.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/authors.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/index.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/news/index.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/reference/anomaly.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/reference/ctasval.html</loc></url>
+<url><loc>https://impala-consortium.github.io/ctasval/reference/cumsum_fraction.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/reference/get_anomaly_data.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/reference/get_anomaly_scores.html</loc></url>
 <url><loc>https://impala-consortium.github.io/ctasval/reference/get_ctas.html</loc></url>
