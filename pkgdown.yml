@@ -3,7 +3,7 @@ pkgdown: 2.1.1
 pkgdown_sha: ~
 articles:
   autocorr: autocorr.html
-last_built: 2025-01-31T17:01Z
+last_built: 2025-01-31T17:07Z
 urls:
   reference: https://impala-consortium.github.io/ctasval/reference
   article: https://impala-consortium.github.io/ctasval/articles
