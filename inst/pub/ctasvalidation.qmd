@@ -100,7 +100,7 @@ Here we demonstrate the efficiency in detecting anomalous sites using simulation
 
 ## Algorithm
 
-### PROCESSING TIMESERIES
+### Processing Time Series
 
 The starting point of CTAS is a set of clinical trial data. Reprocessing the data into a format accepted by CTAS is required as first step. Details on the CTAS data format are described at the project Github repository.
 
@@ -108,7 +108,7 @@ The user is free to include data from any data domain as long as the data is num
 
 The CTAS input arguments give the user plenty of flexibility in defining time points that constitute a time series. Alternatively, the package can be given the freedom of defining time series in a data-driven manner. Additionally, the arguments can be used to restrict the time series features calculated (more details below) and choose the site-scoring method (also, see below).
 
-#### DEFINING TIME SERIES
+#### Defining Time Series
 
 By default, a time series must have at least three time points, there must be at least three eligible subjects per time series, and a subject can have at most half of time points missing. These parameters can of course be changed by the user to fit the characteristics of the trial better.
 
@@ -116,25 +116,22 @@ The user can also have baseline-adjusted time series generated if baseline value
 
 In an ongoing study, some subjects might have only taken the first visits while some have already finished the study. This is the reason why more than one time series per parameter can be defined. For example, one time series would include almost all planned time points and would be useful for comparing sites and subjects which have largely finished the trial. Another time series might focus on the first few visits to also include subjects which have only lately been enrolled. @fig-timeseries-def gives a simplified example of a set of two time series defined for a parameter.
 
-#### TIME SERIES FEATURES
+#### Timeseries Features
 
-Each time series is characterized by a set of time series features. These features are central to the algorithm as they are used to flag anomalous sites (see below). In addition, the features can be used to identify individual subjects with peculiar time series. Currently available time series features are listed in the table below. For an illustration of features for a time series, please see @fig-timeseries-feats.
+Each time series is characterized by a set of time series features. These features are central to the algorithm as they are used to flag anomalous sites (see below). In addition, the features can be used to identify individual subjects with peculiar time series. Currently available time series features consist of:
 
-| Feature code | Description |
-|--------------------------|----------------------------------------------|
-| autocorr | Auto-correlation |
-| average | Average value |
-| own_site_simil_score | Measure of co-clustering of time series from the same study site |
-| sd | Standard deviation |
-| unique_value_count_relative | Number of unique values divided by number of values available |
-| range | Maximum difference between two time points in a series |
-| lof | Local Outlier Factor. Values around one are inliers while the larger the value, more of an outlier the timeseries is. @breunig_lof_2000 |
+- Autocorrelation (Correlation with preceeding value)
+- Average Value
+- Standard Deviation
+- Range
+- Unique Value Ratio (Number of unique values divided by number of values available)
+- Local Outlier Factor (Local deviation of a given data point with respect to its neighbours) @breunig_lof_2000
 
-: List of time series features
+> BK: the illustration lacks range and local outlier factor
 
-### FLAGGING SITES
+For an illustration of features for a time series, please see @fig-timeseries-feats.
 
-> BK: we need to mention the three different site scoring methods
+### Flagging Sites
 
 Flagging sites with a systematic bias in their time series is an important part of study monitoring. If identified early enough, the site can be offered further training if the site has had trouble in interpreting the study protocol. In the extreme case, if the bias is due to intentional misconduct, the site can be closed and excluded from analysis.
 
@@ -164,7 +161,7 @@ As a simple baseline model for anomaly detection, we also scored sites based on 
 
 The primary advantage of this method is its simplicity and ease of understanding. It provides a clear and straightforward way to identify sites with unusual feature values. However, this approach does not take into account the size of the site. A site with only one subject who has an extreme feature value may get flagged, even though this could be due to chance alone and may not indicate a systematic issue with the site. Like the Kolmogorov-Smirnov approach, this method does not account for region and country-level demographic factors that might influence feature values.
 
-### IDENTIFYING ANOMALIES IN INDIVIDUAL TIME SERIES
+### Identifying Anomalies in Individual Time
 
 > BK: consider removing this sections if we run out of space, as we do not include it in validation FC: agree, not in focus of this publication
 
@@ -178,7 +175,7 @@ To evaluate CTAS performance for detecting sites with anomalous time series we s
 
 For each anomaly in scope we applied a specific transformation with a given degree to the measurements of three randomly added sites.
 
--   Autocorrelation was introduced by adding a sinus signal multiplied by the anomaly degree to the original values.
+-   Autocorrelation was introduced by adding the preceeding value multiplied by the anomoly degree to each value.
 
 -   The average was increased by adding the site mean multiplied by the anomaly degree to the original values.
 
@@ -190,7 +187,7 @@ For each anomaly in scope we applied a specific transformation with a given degr
 
 -   The unique value count per site was increased by replacing a ratio of observations with the first observed value per patient. The ratio would be determined by the anomaly degree.
 
-The anomalies introduced are visualized in @fig-anomalies.
+The anomalies introduced are visualized in @fig-anomalies based on a simulated sdtm test data set @pharmaversesdtm.
 
 Subsequently we tried to detect the three anomalous sites using different site scoring methods among the compliant sites in the study data set. For each site we used the highest CTAS score and employed a threshold of 1.3 if applicable. This was repeated a 100 times and true positive rate (TPR) and false positive rate (FPR) were calculated using the combined results.
 
@@ -202,7 +199,9 @@ Among the three site flagging methods, we observed that the average method achie
 
 We did not observe strong differences between the four different parameters. Some parameters were more susceptible to anomalies, resulting in higher TPR at lower anomaly degrees. This is expected, as anomalies were introduced by multiplying existing measurements, which are more sensitive to higher starting values. An exception was the weight metric, for which the CTAS tool achieved a TPR of less than 50% when detecting unique value outliers. This discrepancy is likely due to the high frequency of rounding in weight results in studies, leading to fewer unique values per time series compared to other parameters like laboratory measurements. This finding underscores the importance of considering the nature of the data when interpreting the performance of anomaly detection methods.
 
-Autocorrelation and local outlier factor anomalies, which are more complex, were also difficult to detect. We barely detected half of the introduced outliers. For the autocorrelation feature, the TPR was very low across all methods. This is likely due to the implementation of the function that generated artificial anomalies, suggesting that the current method of introducing autocorrelation anomalies may not be effective, or that the feature itself is less sensitive to the types of anomalies introduced.
+> BK: I would expect autocorr and unique_value_count FPR to be similar as both values max out at 1. Maybe when we get the combined results. I will do some EDA on the lof.
+
+Autocorrelation and local outlier factor anomalies, which are more complex, were also difficult to detect. We barely detected half of the introduced outliers. 
 
 Overall, the Mixed Effects Modeling method emerged as the most robust approach for detecting site-level anomalies, providing a good balance between high TPR and low FPR. The average feature value method, while effective in identifying true positives, was less reliable due to its high false positive rate. The performance of the CTAS tool was consistent across different studies. Feature-specific analysis revealed challenges in detecting anomalies in autocorrelation and unique value counts for weight parameters, suggesting areas for further refinement in the anomaly detection process.
 
@@ -225,8 +224,6 @@ Sample-size induced variability can also be introduced by differences in the num
 While the number of patients at a site is an important factor that determines whether site anomalies can be statistically detected the length of the individual time series is also important.
 
 The explanation here is that the majority of the studies only measured weight during screening. For a time series of length one all patients will have a relative unique value count of 1.
-
-> BK Here we need to say something about the more complex anomalies lof and autocorr, not sure exactly yet what to say about autocorr
 
 Local outlier factor creates a multidimensional distance metric that is hard to emulate artificially. Nevertheless the approach to transform patients measurement by a random non-normal distribution could increase the distance of the anomalous site to the rest of the data set to some extend. And CTAS was able to detect around 50% of the anomalous sites.
 
@@ -262,19 +259,26 @@ PT designed the CTAS algorithm, and wrote the R package. All authors participate
 
 @fig-timeseries-feats Example of a time series with four time points and the features calculated from it. There is one feature which needs more explanation: site co-clustering - a measure of how similar the time series is to other subjects from the same site vs. subjects from all other sites. It is used to identify sites whose time series for a particular parameter are more similar to each other than could be expected by chance. In the extreme case, this could be indicative of sample splitting, i.e., a type of fraud where samples are collected from only one individual but assigned to several subjects. Figure 3 illustrates how co-clustering is calculated for a single time series.
 
+<!--
+< BK: not referenced in text
 @fig-co-clustering Calculating a site co-clustering feature for a time series. Spheres on the left represent individual time series (red = time series for which we are calculating the feature (query), pink = time series of other subjects from the same site, white = time series of subjects from other sites). First the time series are ranked based on their distance to the query. A ROC curve is calculated for the ranked time series and a Area Under Curve (AUC) is calculated for the curve. The AUC is then used as the co-clustering feature. A feature of value of 1 means that fellow subjects from the same site are all closer to the query than subjects from other sites. A value of zero is the opposite of this and the value 0.5 means that there is no difference between subjects from the query's own site and the subjects from other sites.
+-->
 
 @fig-site-flagging Example of site flagging. The timeseries has eight time points and the question is whether the site (six subjects) has reported fewer unique values per time series than other sites in the study. Part 1) has the individual subject time series and the unique value counts. It is clear from the histograms (2) that the site is biased when compared to other sites. To quantify the bias, the distributions are compared with the Kolmogorov-Smirnov test (3) which gives us a raw p-value. As we perform several tests per study, the p-value must be corrected (4). Finally, the negative logarithm of the corrected p-value is taken to come up with the final score for the site (5).
+
+<!--
+> BK: not referenced in text
 
 @fig-co-cluster-example Example of co-clustering of systolic blood pressure profiles. Site X was flagged by the tool for a significant bias in the site co-clustering feature. This is evident in the time series (1) as almost all measurements are within the narrow range of 120 to 140 mmHg whereas measurements from other sites vary over a wider range (blue lines). This is also evident in the similarity plot (2) which visualizes the relative distance between time series. On this plot, almost all Site X subjects (filled circles) are clearly co-clustered.
 
 @fig-average-example Example of a site with systematically large values for a laboratory assay. The difference in the average results is clear in both the histogram (1) and the individual time series (2).
+-->
 
 @fig-similarity-plot An anomalous weight profile identified based on its distance from other profiles on the similarity plot (left). The profile is given on the right with a sudden drop in weight followed by a return to the previous values. In this case, the reason is probably a data entry error at site.
 
 @fig-sd-example Identifying an individual time series outlier based on a time series feature. In this case the subject with most variable bilirubin profile (1) has been selected and highlighted with the other subjects (2). In this case, it is possible that the site has collected the data correctly but this might be interesting for someone performing medical review to identify safety issues, for example.
 
-@fig-anomalies Simulated site-level anomalies of of varying degree across different anomaly types. Timelines from regular sites are shown in grey and timelines from an anomalous site in red. The number of patients per anomalous site is sampled from the distribution of the number of patients per site from the original data set.
+@fig-anomalies Simulated site-level anomalies of of varying degree across different anomaly types based on a simulated test data set. Timelines from regular sites are shown in grey and timelines from an anomalous site in red. 
 
 @fig-results True positive and false positive ratio across different simulation scenarios. Ratios are represented as the mean with standard deviation obtained by 15 replicates obtained from simulations based on different studies. Timelines from two laboratory (Alanine Aminotransferase, Creatinine) and 2 vitals mesurements (Systolic Blood Pressure, Weight) were selected to be included in the simulation. The simulations randomly introduced 3 anomalous sites with increasing anomaly degrees into each iteration which needed to be detected by the CTAS algorithm. Study-level ratios were based on simulations with 100 iterations.
 
@@ -288,153 +292,27 @@ PT designed the CTAS algorithm, and wrote the R package. All authors participate
 
 ![Timeseries Features](timeseries_feats.png){#fig-timeseries-feats}
 
+<!--
+> BK: not referenced in text
 ![Co-Clustering](co_clustering.png){#fig-co-clustering}
+-->
 
 ![Site Flagging](site_flagging.png){#fig-site-flagging}
 
+<!--
+> BK: not referenced in text
 ![Example Co-Clustering](co_cluster_example.png){#fig-co-cluster-example}
 
+> BK: not referenced in text
 ![Example Average](average_example.png){#fig-average-example}
+-->
 
 ![Similarity Plot](similarity_plot.png){#fig-similarity-plot}
 
 ![Example Standard Deviation](sd_example.png){#fig-sd-example}
 
-```{r echo=FALSE, fig.width=10, fig.height=9}
-#| label: fig-tpr
-#| fig-cap: "True positive rates"
 
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-
-# Read the data from the specified file
-evaluation_results <- read.delim2("inst/pub/evaluation_results.txt")
-
-# Recode the feats column
-evaluation_results <- evaluation_results %>%
-  mutate(feats = recode(feats,
-                        "autocorr" = "Auto correlation",
-                        "average" = "Average",
-                        "lof" = "Local Outlier Factor",
-                        "range" = "Range",
-                        "sd" = "Standard deviation",
-                        "unique_value_count_relative" = "Unique value ratio"))
-
-# Aggregate data by averaging tpr and fpr and calculating standard deviation
-df_agg <- evaluation_results %>%
-  group_by(anomaly_degree, feats, parameter_id, site_scoring_method) %>%
-  summarise(
-    avg_tpr = mean(tpr),
-    sd_tpr = sd(tpr),
-    avg_fpr = mean(fpr),
-    sd_fpr = sd(fpr),
-    .groups = 'drop'
-  )
-
-# Reshape data for plotting
-df_long <- df_agg %>%
-  pivot_longer(cols = c(avg_tpr, avg_fpr), names_to = "metric", values_to = "value") %>%
-  pivot_longer(cols = c(sd_tpr, sd_fpr), names_to = "metric_sd", values_to = "sd_value")
-
-# Filter data for TPR and FPR
-df_tpr <- df_long %>% filter(metric == "avg_tpr" & metric_sd == "sd_tpr")
-df_fpr <- df_long %>% filter(metric == "avg_fpr" & metric_sd == "sd_fpr")
-
-# Convert anomaly_degree to a factor to treat it as categorical
-df_tpr$anomaly_degree <- as.factor(df_tpr$anomaly_degree)
-df_fpr$anomaly_degree <- as.factor(df_fpr$anomaly_degree)
-
-# Create the TPR plot
-p_tpr <- ggplot(df_tpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
-  geom_line(linewidth = 1.2) +
-  geom_point() +
-  geom_ribbon(aes(ymin = value - sd_value, ymax = value + sd_value, fill = site_scoring_method), alpha = 0.2) +
-  facet_grid(parameter_id ~ feats, scales = "fixed") +
-  labs(x = "Anomaly Degree", y = "Average TPR", color = "Site Scoring Method", fill = "Site Scoring Method") +
-  theme_bw() +
-  theme(
-    strip.text = element_text(size = 10, margin = margin(t = 5, r = 5, b = 5, l = 5)),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
-    legend.title = element_text(size = 10),
-    plot.title = element_text(size = 12, face = "bold"),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10)
-  ) +
-  ggtitle("Line Plots of TPR by Anomaly Degree")
-
-```
-
-```{r echo=FALSE, fig.width=10, fig.height=9}
-#| label: fig-fpr
-#| fig-cap: "False positive rates"
-
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-
-# Read the data from the specified file
-evaluation_results <- read.delim2("inst/pub/evaluation_results.txt")
-
-# Recode the feats column
-evaluation_results <- evaluation_results %>%
-  mutate(feats = recode(feats,
-                        "autocorr" = "Auto correlation",
-                        "average" = "Average",
-                        "lof" = "Local Outlier Factor",
-                        "range" = "Range",
-                        "sd" = "Standard deviation",
-                        "unique_value_count_relative" = "Unique value ratio"))
-
-# Aggregate data by averaging tpr and fpr and calculating standard deviation
-df_agg <- evaluation_results %>%
-  group_by(anomaly_degree, feats, parameter_id, site_scoring_method) %>%
-  summarise(
-    avg_tpr = mean(tpr),
-    sd_tpr = sd(tpr),
-    avg_fpr = mean(fpr),
-    sd_fpr = sd(fpr),
-    .groups = 'drop'
-  )
-
-# Reshape data for plotting
-df_long <- df_agg %>%
-  pivot_longer(cols = c(avg_tpr, avg_fpr), names_to = "metric", values_to = "value") %>%
-  pivot_longer(cols = c(sd_tpr, sd_fpr), names_to = "metric_sd", values_to = "sd_value")
-
-# Filter data for TPR and FPR
-df_tpr <- df_long %>% filter(metric == "avg_tpr" & metric_sd == "sd_tpr")
-df_fpr <- df_long %>% filter(metric == "avg_fpr" & metric_sd == "sd_fpr")
-
-# Convert anomaly_degree to a factor to treat it as categorical
-df_tpr$anomaly_degree <- as.factor(df_tpr$anomaly_degree)
-df_fpr$anomaly_degree <- as.factor(df_fpr$anomaly_degree)
-
-# Create the FPR plot
-p_fpr <- ggplot(df_fpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
-  geom_line(linewidth = 1.2) +
-  geom_point() +
-  geom_ribbon(aes(ymin = value - sd_value, ymax = value + sd_value, fill = site_scoring_method), alpha = 0.2) +
-  facet_grid(parameter_id ~ feats, scales = "fixed") +
-  labs(x = "Anomaly Degree", y = "Average FPR", color = "Site Scoring Method", fill = "Site Scoring Method") +
-  theme_bw() +
-  theme(
-    strip.text = element_text(size = 10, margin = margin(t = 5, r = 5, b = 5, l = 5)),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
-    legend.title = element_text(size = 10),
-    plot.title = element_text(size = 12, face = "bold"),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10)
-  ) +
-  ggtitle("Line Plots of FPR by Anomaly Degree")
-
-```
-
-```{r echo=FALSE, fig.width=10, fig.height=9}
+```{r echo=FALSE, fig.width=10, fig.height=9, warning=FALSE, message=FALSE}
 #| label: fig-anomalies
 #| fig-cap: "Anomalies"
 
@@ -445,13 +323,26 @@ suppressPackageStartupMessages(library(ctasval))
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
 df_filt <- df_prep %>%
-  filter(parameter_id == "Alkaline Phosphatase")
+  filter(parameter_id == "Alkaline Phosphatase") %>%
+  mutate(
+    timepoint_rank = dense_rank(timepoint_rank)
+  )
+
 
 set.seed(1)
 
+# with this wrapper functions will always generate an anomalous site with the same patients
+set_seed <- function(fun, seed = 1){
+  fun_seeded <- function(...) {
+    set.seed(seed)
+    fun(...)
+  }
+}
+
+
 df_anomaly <- tibble(
     anomaly_fun = list(
-      anomaly_autocorr,
+      anomaly_autocorr2,
       anomaly_average,
       anomaly_lof,
       anomaly_range,
@@ -459,12 +350,12 @@ df_anomaly <- tibble(
       anomaly_unique_value_count_relative
     ),
     anomaly = c(
-      "autocorr",
-      "average",
-      "lof",
-      "range",
-      "sd",
-      "unique_value_count_relative"
+      "Auto correlation",
+      "Average",
+      "Local Outlier Factor",
+      "Range",
+      "Standard Deviation",
+      "Unique Value Ratio"
     )
   ) %>%
   mutate(
@@ -472,79 +363,158 @@ df_anomaly <- tibble(
   ) %>%
   unnest(anomaly_degree) %>%
   mutate(
+    anomaly_fun = map(anomaly_fun, ~ set_seed(., seed = 4)),
     data = map2(anomaly_fun, anomaly_degree, ~ .x(df_filt, .y))
   ) %>%
-  unnest(data)
+  unnest(data) %>%
+  arrange(subject_id, timepoint_rank) %>%
+  mutate(
+    is_lim = ifelse(result > 4000, "out of range", ""),
+    result_cap_max = ifelse(result > 4000, 4000, result),
+    result_cap_NA = ifelse(result_cap_max >= 4000 & lag(result_cap_max) > 4000, NA, result_cap_max),
+    .by = subject_id
+  )
 
-ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
+df_filt_exp <- df_filt %>%
+  mutate(
+    anomaly = list(unique(df_anomaly$anomaly))
+  ) %>%
+  unnest(anomaly) %>%
+  mutate(
+    result = ifelse(anomaly == "Unique Value Ratio" & result > 250, NA, result)
+  )
+
+
+ggplot(df_filt_exp, aes(x = timepoint_rank, y = result, group = subject_id)) +
   geom_line(color = "darkgrey", alpha = 0.5) +
-  geom_line(data = df_anomaly, color = "tomato", alpha = 0.5) +
+  geom_line(data = df_anomaly, aes(y = result_cap_NA), color = "tomato", alpha = 0.5) +
+  geom_point(data = df_anomaly, aes(y = result_cap_max, shape = is_lim), color = "tomato", alpha = 0.5) +
+  scale_shape_manual(values = c(NA, 3)) +
   facet_grid(anomaly ~ anomaly_degree, scales = "free_y") +
-  coord_cartesian(xlim = c(0, 15)) +
   theme_ctas() +
-  labs(x = "Timepoint Rank", y = "Alkaline Phosphatase U/L")
+  theme(legend.position = "bottom") +
+  labs(x = "Timepoint Rank", y = "Alkaline Phosphatase U/L", shape = "")
   
 
 ```
 
-```{r echo=FALSE, fig.height=12, fig.width=10}
+```{r results, echo=FALSE, warning=FALSE, message=FALSE}
+
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+path <- here::here("inst/pub/")
+
+
+# Read the data from the specified file
+evaluation_results <- read.delim2(file.path(path, "evaluation_results.txt"))
+
+# Recode the feats column
+evaluation_results <- evaluation_results %>%
+  mutate(feats = recode(feats,
+                        "autocorr" = "Auto correlation",
+                        "average" = "Average",
+                        "lof" = "Local Outlier Factor",
+                        "range" = "Range",
+                        "sd" = "Standard Deviation",
+                        "unique_value_count_relative" = "Unique Value Ratio"),
+         site_scoring_method = recode(site_scoring_method,
+                                      "ks" = "K-S",
+                                      "mixedeffects" = "Mixed Effects",
+                                      "avg_feat_value" = "Average Feature Value"))
+
+# Aggregate data by averaging tpr and fpr and calculating standard deviation
+df_agg <- evaluation_results %>%
+  group_by(anomaly_degree, feats, parameter_id, site_scoring_method) %>%
+  summarise(
+    avg_tpr = mean(tpr),
+    sd_tpr = sd(tpr),
+    avg_fpr = mean(fpr),
+    sd_fpr = sd(fpr),
+    .groups = 'drop'
+  )
+
+# Reshape data for plotting
+df_long <- df_agg %>%
+  pivot_longer(cols = c(avg_tpr, avg_fpr), names_to = "metric", values_to = "value") %>%
+  pivot_longer(cols = c(sd_tpr, sd_fpr), names_to = "metric_sd", values_to = "sd_value")
+
+# Filter data for TPR and FPR
+df_tpr <- df_long %>% 
+  filter(metric == "avg_tpr" & metric_sd == "sd_tpr") %>%
+  mutate(
+    ymin = value - sd_value,
+    ymin = ifelse(ymin < 0, 0, ymin),
+    ymax = value + sd_value
+  )
+
+df_fpr <- df_long %>% 
+  filter(metric == "avg_fpr" & metric_sd == "sd_fpr") %>%
+  mutate(
+    ymin = value - sd_value,
+    ymin = ifelse(ymin < 0, 0, ymin),
+    ymax = value + sd_value
+  )
+
+
+# Create the TPR plot
+p_tpr <- ggplot(df_tpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
+  geom_line(linewidth = 1.2) +
+  geom_point() +
+  geom_ribbon(aes(ymin = ymin, ymax = ymax, fill = site_scoring_method), alpha = 0.2) +
+  scale_x_log10(breaks = c(0.01, 0.25, 0.5, 0.75, 1, 5, 10), labels = c("0", "0.25", "0.5", "0.75", "1", "5", "10")) +
+  facet_grid(parameter_id ~ feats, scales = "fixed") +
+  labs(x = "Log-Scaled Anomaly Degree", y = "Average TPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method") +
+  theme_bw() +
+  theme(
+    strip.text = element_text(size = 8, margin = margin(t = 5, r = 5, b = 5, l = 5)),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 10),
+    plot.title = element_text(size = 12, face = "bold"),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10),
+    legend.position = "bottom"
+  ) +
+  ggtitle("Line Plots of FPR/TPR by Anomaly Degree")
+
+
+# Create the FPR plot
+p_fpr <- ggplot(df_fpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
+  geom_line(linewidth = 1.2) +
+  geom_point() +
+  geom_ribbon(aes(ymin = ymin, ymax = ymax, fill = site_scoring_method), alpha = 0.2) +
+  scale_x_log10(breaks = c(0.01, 0.25, 0.5, 0.75, 1, 5, 10), labels = c("0", "0.25", "0.5", "0.75", "1", "5", "10")) +
+  facet_grid(parameter_id ~ feats, scales = "fixed") +
+  labs(x = "Log-Scaled Anomaly Degree", y = "Average FPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method") +
+  theme_bw() +
+  theme(
+    strip.text = element_text(size = 8, margin = margin(t = 5, r = 5, b = 5, l = 5)),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 10),
+    plot.title = element_text(size = 12, face = "bold"),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10),
+    legend.position = "bottom"
+  )
+
+```
+
+```{r echo=FALSE, fig.height=14, fig.width=10, warning=FALSE, message=FALSE}
 #| label: fig-results
 #| fig-cap: 
 #|   - "Results"
 
-path <- here::here("inst/pub/")
-
-df_results <- tibble(
-    files = dir(path, pattern = "collected_results_", full.names = TRUE)
-  ) %>%
-  mutate(
-    data = purrr::map(files, ~ readr::read_csv(., show_col_types = FALSE))
-  ) %>%
-  unnest(data)
-
-stopifnot(nrow(df_results) > 0)
-
-plot_ratio <- function(df_results, ratio) {
-  
-  df_results %>%
-    mutate(
-      ratio = .data[[ratio]],
-      ratio = replace_na(ratio, 0),
-    ) %>%
-    summarise(
-      ratio_mean = mean(ratio),
-      ratio_lwr = ratio_mean - sd(ratio),
-      ratio_lwr = ifelse(ratio_lwr < 0, 0, ratio_lwr),
-      ratio_upr = ratio_mean + sd(ratio),
-      ratio_upr = ifelse(ratio_upr > 1, 1, ratio_upr),
-      .by = c(parameter_id, feats, anomaly_degree, method)
-    ) %>%
-    ggplot(aes(log(anomaly_degree),  ratio_mean, color = method)) +
-    geom_line(aes(color = method), alpha = 0.5) +
-    geom_pointrange(aes(ymin = ratio_lwr, ymax = ratio_upr), alpha = 0.5) +
-    facet_grid(parameter_id ~ feats) + 
-    theme_ctas() +
-    theme(legend.position = "bottom")
-  
-}
-
-p_tpr <- plot_ratio(df_results, ratio = "tpr") +
-  labs(
-    y = "Average True Positive Ratio (+/- SD)",
-    x = "Log Anomaly Degree",
-    color = "Site Scoring Method"
-  )
-
-
-p_fpr <- plot_ratio(df_results, ratio = "fpr") +
-  labs(
-    y = "Average False Positive Ratio (+/- SD)",
-    x = "Log Anomaly Degree",
-    color = "Site Scoring Method"
-  )
 
 p_tpr / p_fpr / guide_area() + plot_layout(guides = "collect", axes = "collect", heights = c(1, 1, 0.1))
+
 ```
+
+
+
+
 
 # References
 
@@ -553,4 +523,4 @@ p_tpr / p_fpr / guide_area() + plot_layout(guides = "collect", axes = "collect",
 
 # Supporting Material
 
-The CTAS R package is available on github https://github.com/IMPALA-Consortium/ctas as version v0.3.0 . The code written for the validation is available in a separate repository https://github.com/IMPALA-Consortium/ctasval version v0.0.3 .
+The CTAS R package is available on github https://github.com/IMPALA-Consortium/ctas as version v0.3.0 . The code written for the validation is available in a separate repository https://github.com/IMPALA-Consortium/ctasval version v0.0.5 .
