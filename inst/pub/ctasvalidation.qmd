@@ -300,139 +300,6 @@ PT designed the CTAS algorithm, and wrote the R package. All authors participate
 
 ![Example Standard Deviation](sd_example.png){#fig-sd-example}
 
-```{r echo=FALSE, fig.width=10, fig.height=9}
-#| label: fig-tpr
-#| fig-cap: "True positive rates"
-
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-
-# Read the data from the specified file
-evaluation_results <- read.delim2("inst/pub/evaluation_results.txt")
-
-# Recode the feats column
-evaluation_results <- evaluation_results %>%
-  mutate(feats = recode(feats,
-                        "autocorr" = "Auto correlation",
-                        "average" = "Average",
-                        "lof" = "Local Outlier Factor",
-                        "range" = "Range",
-                        "sd" = "Standard deviation",
-                        "unique_value_count_relative" = "Unique value ratio"))
-
-# Aggregate data by averaging tpr and fpr and calculating standard deviation
-df_agg <- evaluation_results %>%
-  group_by(anomaly_degree, feats, parameter_id, site_scoring_method) %>%
-  summarise(
-    avg_tpr = mean(tpr),
-    sd_tpr = sd(tpr),
-    avg_fpr = mean(fpr),
-    sd_fpr = sd(fpr),
-    .groups = 'drop'
-  )
-
-# Reshape data for plotting
-df_long <- df_agg %>%
-  pivot_longer(cols = c(avg_tpr, avg_fpr), names_to = "metric", values_to = "value") %>%
-  pivot_longer(cols = c(sd_tpr, sd_fpr), names_to = "metric_sd", values_to = "sd_value")
-
-# Filter data for TPR and FPR
-df_tpr <- df_long %>% filter(metric == "avg_tpr" & metric_sd == "sd_tpr")
-df_fpr <- df_long %>% filter(metric == "avg_fpr" & metric_sd == "sd_fpr")
-
-# Convert anomaly_degree to a factor to treat it as categorical
-df_tpr$anomaly_degree <- as.factor(df_tpr$anomaly_degree)
-df_fpr$anomaly_degree <- as.factor(df_fpr$anomaly_degree)
-
-# Create the TPR plot
-p_tpr <- ggplot(df_tpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
-  geom_line(linewidth = 1.2) +
-  geom_point() +
-  geom_ribbon(aes(ymin = value - sd_value, ymax = value + sd_value, fill = site_scoring_method), alpha = 0.2) +
-  facet_grid(parameter_id ~ feats, scales = "fixed") +
-  labs(x = "Anomaly Degree", y = "Average TPR", color = "Site Scoring Method", fill = "Site Scoring Method") +
-  theme_bw() +
-  theme(
-    strip.text = element_text(size = 10, margin = margin(t = 5, r = 5, b = 5, l = 5)),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
-    legend.title = element_text(size = 10),
-    plot.title = element_text(size = 12, face = "bold"),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10)
-  ) +
-  ggtitle("Line Plots of TPR by Anomaly Degree")
-
-```
-
-```{r echo=FALSE, fig.width=10, fig.height=9}
-#| label: fig-fpr
-#| fig-cap: "False positive rates"
-
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
-
-# Read the data from the specified file
-evaluation_results <- read.delim2("inst/pub/evaluation_results.txt")
-
-# Recode the feats column
-evaluation_results <- evaluation_results %>%
-  mutate(feats = recode(feats,
-                        "autocorr" = "Auto correlation",
-                        "average" = "Average",
-                        "lof" = "Local Outlier Factor",
-                        "range" = "Range",
-                        "sd" = "Standard deviation",
-                        "unique_value_count_relative" = "Unique value ratio"))
-
-# Aggregate data by averaging tpr and fpr and calculating standard deviation
-df_agg <- evaluation_results %>%
-  group_by(anomaly_degree, feats, parameter_id, site_scoring_method) %>%
-  summarise(
-    avg_tpr = mean(tpr),
-    sd_tpr = sd(tpr),
-    avg_fpr = mean(fpr),
-    sd_fpr = sd(fpr),
-    .groups = 'drop'
-  )
-
-# Reshape data for plotting
-df_long <- df_agg %>%
-  pivot_longer(cols = c(avg_tpr, avg_fpr), names_to = "metric", values_to = "value") %>%
-  pivot_longer(cols = c(sd_tpr, sd_fpr), names_to = "metric_sd", values_to = "sd_value")
-
-# Filter data for TPR and FPR
-df_tpr <- df_long %>% filter(metric == "avg_tpr" & metric_sd == "sd_tpr")
-df_fpr <- df_long %>% filter(metric == "avg_fpr" & metric_sd == "sd_fpr")
-
-# Convert anomaly_degree to a factor to treat it as categorical
-df_tpr$anomaly_degree <- as.factor(df_tpr$anomaly_degree)
-df_fpr$anomaly_degree <- as.factor(df_fpr$anomaly_degree)
-
-# Create the FPR plot
-p_fpr <- ggplot(df_fpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
-  geom_line(linewidth = 1.2) +
-  geom_point() +
-  geom_ribbon(aes(ymin = value - sd_value, ymax = value + sd_value, fill = site_scoring_method), alpha = 0.2) +
-  facet_grid(parameter_id ~ feats, scales = "fixed") +
-  labs(x = "Anomaly Degree", y = "Average FPR", color = "Site Scoring Method", fill = "Site Scoring Method") +
-  theme_bw() +
-  theme(
-    strip.text = element_text(size = 10, margin = margin(t = 5, r = 5, b = 5, l = 5)),
-    axis.text = element_text(size = 8),
-    axis.title = element_text(size = 10),
-    legend.text = element_text(size = 8),
-    legend.title = element_text(size = 10),
-    plot.title = element_text(size = 12, face = "bold"),
-    plot.margin = margin(t = 10, r = 10, b = 10, l = 10)
-  ) +
-  ggtitle("Line Plots of FPR by Anomaly Degree")
-
-```
 
 ```{r echo=FALSE, fig.width=10, fig.height=9}
 #| label: fig-anomalies
@@ -487,64 +354,123 @@ ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
 
 ```
 
-```{r echo=FALSE, fig.height=12, fig.width=10}
+```{r results, echo=FALSE, warning=FALSE}
+
+# Load necessary libraries
+library(ggplot2)
+library(dplyr)
+library(tidyr)
+path <- here::here("inst/pub/")
+
+
+# Read the data from the specified file
+evaluation_results <- read.delim2(file.path(path, "evaluation_results.txt"))
+
+# Recode the feats column
+evaluation_results <- evaluation_results %>%
+  mutate(feats = recode(feats,
+                        "autocorr" = "Auto correlation",
+                        "average" = "Average",
+                        "lof" = "Local Outlier Factor",
+                        "range" = "Range",
+                        "sd" = "Standard Deviation",
+                        "unique_value_count_relative" = "Unique Value Ratio"),
+         site_scoring_method = recode(site_scoring_method,
+                                      "ks" = "K-S",
+                                      "mixedeffects" = "Mixed Effects",
+                                      "avg_feat_value" = "Average Feature Value"))
+
+# Aggregate data by averaging tpr and fpr and calculating standard deviation
+df_agg <- evaluation_results %>%
+  group_by(anomaly_degree, feats, parameter_id, site_scoring_method) %>%
+  summarise(
+    avg_tpr = mean(tpr),
+    sd_tpr = sd(tpr),
+    avg_fpr = mean(fpr),
+    sd_fpr = sd(fpr),
+    .groups = 'drop'
+  )
+
+# Reshape data for plotting
+df_long <- df_agg %>%
+  pivot_longer(cols = c(avg_tpr, avg_fpr), names_to = "metric", values_to = "value") %>%
+  pivot_longer(cols = c(sd_tpr, sd_fpr), names_to = "metric_sd", values_to = "sd_value")
+
+# Filter data for TPR and FPR
+df_tpr <- df_long %>% 
+  filter(metric == "avg_tpr" & metric_sd == "sd_tpr") %>%
+  mutate(
+    ymin = value - sd_value,
+    ymin = ifelse(ymin < 0, 0, ymin),
+    ymax = value + sd_value
+  )
+
+df_fpr <- df_long %>% 
+  filter(metric == "avg_fpr" & metric_sd == "sd_fpr") %>%
+  mutate(
+    ymin = value - sd_value,
+    ymin = ifelse(ymin < 0, 0, ymin),
+    ymax = value + sd_value
+  )
+
+
+# Create the TPR plot
+p_tpr <- ggplot(df_tpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
+  geom_line(linewidth = 1.2) +
+  geom_point() +
+  geom_ribbon(aes(ymin = ymin, ymax = ymax, fill = site_scoring_method), alpha = 0.2) +
+  scale_x_log10(breaks = c(0.01, 0.25, 0.5, 0.75, 1, 5, 10), labels = c("0", "0.25", "0.5", "0.75", "1", "5", "10")) +
+  facet_grid(parameter_id ~ feats, scales = "fixed") +
+  labs(x = "Log-Scaled Anomaly Degree", y = "Average TPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method") +
+  theme_bw() +
+  theme(
+    strip.text = element_text(size = 8, margin = margin(t = 5, r = 5, b = 5, l = 5)),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 10),
+    plot.title = element_text(size = 12, face = "bold"),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10),
+    legend.position = "bottom"
+  ) +
+  ggtitle("Line Plots of FPR/TPR by Anomaly Degree")
+
+
+# Create the FPR plot
+p_fpr <- ggplot(df_fpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
+  geom_line(linewidth = 1.2) +
+  geom_point() +
+  geom_ribbon(aes(ymin = ymin, ymax = ymax, fill = site_scoring_method), alpha = 0.2) +
+  scale_x_log10(breaks = c(0.01, 0.25, 0.5, 0.75, 1, 5, 10), labels = c("0", "0.25", "0.5", "0.75", "1", "5", "10")) +
+  facet_grid(parameter_id ~ feats, scales = "fixed") +
+  labs(x = "Log-Scaled Anomaly Degree", y = "Average FPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method") +
+  theme_bw() +
+  theme(
+    strip.text = element_text(size = 8, margin = margin(t = 5, r = 5, b = 5, l = 5)),
+    axis.text = element_text(size = 8),
+    axis.title = element_text(size = 10),
+    legend.text = element_text(size = 8),
+    legend.title = element_text(size = 10),
+    plot.title = element_text(size = 12, face = "bold"),
+    plot.margin = margin(t = 10, r = 10, b = 10, l = 10),
+    legend.position = "bottom"
+  )
+
+```
+
+```{r echo=FALSE, fig.height=14, fig.width=10}
 #| label: fig-results
 #| fig-cap: 
 #|   - "Results"
 
-path <- here::here("inst/pub/")
-
-df_results <- tibble(
-    files = dir(path, pattern = "collected_results_", full.names = TRUE)
-  ) %>%
-  mutate(
-    data = purrr::map(files, ~ readr::read_csv(., show_col_types = FALSE))
-  ) %>%
-  unnest(data)
-
-stopifnot(nrow(df_results) > 0)
-
-plot_ratio <- function(df_results, ratio) {
-  
-  df_results %>%
-    mutate(
-      ratio = .data[[ratio]],
-      ratio = replace_na(ratio, 0),
-    ) %>%
-    summarise(
-      ratio_mean = mean(ratio),
-      ratio_lwr = ratio_mean - sd(ratio),
-      ratio_lwr = ifelse(ratio_lwr < 0, 0, ratio_lwr),
-      ratio_upr = ratio_mean + sd(ratio),
-      ratio_upr = ifelse(ratio_upr > 1, 1, ratio_upr),
-      .by = c(parameter_id, feats, anomaly_degree, method)
-    ) %>%
-    ggplot(aes(log(anomaly_degree),  ratio_mean, color = method)) +
-    geom_line(aes(color = method), alpha = 0.5) +
-    geom_pointrange(aes(ymin = ratio_lwr, ymax = ratio_upr), alpha = 0.5) +
-    facet_grid(parameter_id ~ feats) + 
-    theme_ctas() +
-    theme(legend.position = "bottom")
-  
-}
-
-p_tpr <- plot_ratio(df_results, ratio = "tpr") +
-  labs(
-    y = "Average True Positive Ratio (+/- SD)",
-    x = "Log Anomaly Degree",
-    color = "Site Scoring Method"
-  )
-
-
-p_fpr <- plot_ratio(df_results, ratio = "fpr") +
-  labs(
-    y = "Average False Positive Ratio (+/- SD)",
-    x = "Log Anomaly Degree",
-    color = "Site Scoring Method"
-  )
 
 p_tpr / p_fpr / guide_area() + plot_layout(guides = "collect", axes = "collect", heights = c(1, 1, 0.1))
+
 ```
+
+
+
+
 
 # References
 
@@ -553,4 +479,4 @@ p_tpr / p_fpr / guide_area() + plot_layout(guides = "collect", axes = "collect",
 
 # Supporting Material
 
-The CTAS R package is available on github https://github.com/IMPALA-Consortium/ctas as version v0.3.0 . The code written for the validation is available in a separate repository https://github.com/IMPALA-Consortium/ctasval version v0.0.3 .
+The CTAS R package is available on github https://github.com/IMPALA-Consortium/ctas as version v0.3.0 . The code written for the validation is available in a separate repository https://github.com/IMPALA-Consortium/ctasval version v0.0.5 .
