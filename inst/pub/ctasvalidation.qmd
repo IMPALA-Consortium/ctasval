@@ -178,7 +178,7 @@ To evaluate CTAS performance for detecting sites with anomalous time series we s
 
 For each anomaly in scope we applied a specific transformation with a given degree to the measurements of three randomly added sites.
 
--   Autocorrelation was introduced by adding a sinus signal multiplied by the anomaly degree to the original values.
+-   Autocorrelation was introduced by adding the preceeding value multiplied by the anomoly degree to each value.
 
 -   The average was increased by adding the site mean multiplied by the anomaly degree to the original values.
 
@@ -312,13 +312,26 @@ suppressPackageStartupMessages(library(ctasval))
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
 df_filt <- df_prep %>%
-  filter(parameter_id == "Alkaline Phosphatase")
+  filter(parameter_id == "Alkaline Phosphatase") %>%
+  mutate(
+    timepoint_rank = dense_rank(timepoint_rank)
+  )
+
 
 set.seed(1)
 
+# with this wrapper functions will always generate an anomalous site with the same patients
+set_seed <- function(fun, seed = 1){
+  fun_seeded <- function(...) {
+    set.seed(seed)
+    fun(...)
+  }
+}
+
+
 df_anomaly <- tibble(
     anomaly_fun = list(
-      anomaly_autocorr,
+      anomaly_autocorr2,
       anomaly_average,
       anomaly_lof,
       anomaly_range,
@@ -326,12 +339,12 @@ df_anomaly <- tibble(
       anomaly_unique_value_count_relative
     ),
     anomaly = c(
-      "autocorr",
-      "average",
-      "lof",
-      "range",
-      "sd",
-      "unique_value_count_relative"
+      "Auto correlation",
+      "Average",
+      "Local Outlier Factor",
+      "Range",
+      "Standard Deviation",
+      "Unique Value Ratio"
     )
   ) %>%
   mutate(
@@ -339,17 +352,37 @@ df_anomaly <- tibble(
   ) %>%
   unnest(anomaly_degree) %>%
   mutate(
+    anomaly_fun = map(anomaly_fun, ~ set_seed(., seed = 4)),
     data = map2(anomaly_fun, anomaly_degree, ~ .x(df_filt, .y))
   ) %>%
-  unnest(data)
+  unnest(data) %>%
+  arrange(subject_id, timepoint_rank) %>%
+  mutate(
+    is_lim = ifelse(result > 4000, "out of range", ""),
+    result_cap_max = ifelse(result > 4000, 4000, result),
+    result_cap_NA = ifelse(result_cap_max >= 4000 & lag(result_cap_max) > 4000, NA, result_cap_max),
+    .by = subject_id
+  )
 
-ggplot(df_filt, aes(x = timepoint_rank, y = result, group = subject_id)) +
+df_filt_exp <- df_filt %>%
+  mutate(
+    anomaly = list(unique(df_anomaly$anomaly))
+  ) %>%
+  unnest(anomaly) %>%
+  mutate(
+    result = ifelse(anomaly == "Unique Value Ratio" & result > 250, NA, result)
+  )
+
+
+ggplot(df_filt_exp, aes(x = timepoint_rank, y = result, group = subject_id)) +
   geom_line(color = "darkgrey", alpha = 0.5) +
-  geom_line(data = df_anomaly, color = "tomato", alpha = 0.5) +
+  geom_line(data = df_anomaly, aes(y = result_cap_NA), color = "tomato", alpha = 0.5) +
+  geom_point(data = df_anomaly, aes(y = result_cap_max, shape = is_lim), color = "tomato", alpha = 0.5) +
+  scale_shape_manual(values = c(NA, 3)) +
   facet_grid(anomaly ~ anomaly_degree, scales = "free_y") +
-  coord_cartesian(xlim = c(0, 15)) +
   theme_ctas() +
-  labs(x = "Timepoint Rank", y = "Alkaline Phosphatase U/L")
+  theme(legend.position = "bottom") +
+  labs(x = "Timepoint Rank", y = "Alkaline Phosphatase U/L", shape = "")
   
 
 ```
