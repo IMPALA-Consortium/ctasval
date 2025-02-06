@@ -384,7 +384,7 @@ df_anomaly <- tibble(
       anomaly_unique_value_count_relative
     ),
     anomaly = c(
-      "Auto correlation",
+      "Auto Correlation",
       "Average",
       "Local Outlier Factor",
       "Range",
@@ -421,8 +421,8 @@ df_filt_exp <- df_filt %>%
 
 ggplot(df_filt_exp, aes(x = timepoint_rank, y = result, group = subject_id)) +
   geom_line(color = "darkgrey", alpha = 0.5) +
-  geom_line(data = df_anomaly, aes(y = result_cap_NA), color = "tomato", alpha = 0.5) +
-  geom_point(data = df_anomaly, aes(y = result_cap_max, shape = is_lim), color = "tomato", alpha = 0.5) +
+  geom_line(data = df_anomaly, aes(y = result_cap_NA), color = "#E72A8A", alpha = 0.5) +
+  geom_point(data = df_anomaly, aes(y = result_cap_max, shape = is_lim), color = "#E72A8A", alpha = 0.5) +
   scale_shape_manual(values = c(NA, 3)) +
   facet_grid(anomaly ~ anomaly_degree, scales = "free_y") +
   theme_ctas() +
@@ -447,7 +447,7 @@ evaluation_results <- read.delim2(file.path(path, "evaluation_results.txt"))
 # Recode the feats column
 evaluation_results <- evaluation_results %>%
   mutate(feats = recode(feats,
-                        "autocorr" = "Auto correlation",
+                        "autocorr" = "Auto Correlation",
                         "average" = "Average",
                         "lof" = "Local Outlier Factor",
                         "range" = "Range",
@@ -494,16 +494,18 @@ df_fpr <- df_long %>%
 
 # Create the TPR plot
 p_tpr <- ggplot(df_tpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
-  geom_line(linewidth = 1.2) +
-  geom_point() +
-  geom_ribbon(aes(ymin = ymin, ymax = ymax, fill = site_scoring_method), alpha = 0.2) +
+  geom_line(aes(linetype = site_scoring_method)) +
+  geom_point(aes(shape = site_scoring_method)) +
+  geom_errorbar(aes(ymin = ymin, ymax = ymax, color = site_scoring_method), alpha = 0.9) +
   scale_x_log10(breaks = c(0.01, 0.25, 0.5, 0.75, 1, 5, 10), labels = c("0", "0.25", "0.5", "0.75", "1", "5", "10")) +
+  scale_color_manual(values = c("#1B9E77", "#D95F01", "#7570B3")) +
   facet_grid(parameter_id ~ feats, scales = "fixed") +
-  labs(x = "Log-Scaled Anomaly Degree", y = "Average TPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method") +
+  labs(x = "Log-Scaled Anomaly Degree", y = "Average TPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method", shape = "Site Scoring Method", linetype = "Site Scoring Method") +
   theme_bw() +
   theme(
     strip.text = element_text(size = 8, margin = margin(t = 5, r = 5, b = 5, l = 5)),
     axis.text = element_text(size = 8),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     axis.title = element_text(size = 10),
     legend.text = element_text(size = 8),
     legend.title = element_text(size = 10),
@@ -516,16 +518,18 @@ p_tpr <- ggplot(df_tpr, aes(x = anomaly_degree, y = value, color = site_scoring_
 
 # Create the FPR plot
 p_fpr <- ggplot(df_fpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
-  geom_line(linewidth = 1.2) +
-  geom_point() +
-  geom_ribbon(aes(ymin = ymin, ymax = ymax, fill = site_scoring_method), alpha = 0.2) +
+  geom_line(aes(linetype = site_scoring_method)) +
+  geom_point(aes(shape = site_scoring_method)) +
+  geom_errorbar(aes(ymin = ymin, ymax = ymax, color = site_scoring_method), alpha = 0.9) +
   scale_x_log10(breaks = c(0.01, 0.25, 0.5, 0.75, 1, 5, 10), labels = c("0", "0.25", "0.5", "0.75", "1", "5", "10")) +
+  scale_color_manual(values = c("#1B9E77", "#D95F01", "#7570B3")) +
   facet_grid(parameter_id ~ feats, scales = "fixed") +
-  labs(x = "Log-Scaled Anomaly Degree", y = "Average FPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method") +
+  labs(x = "Log-Scaled Anomaly Degree", y = "Average TPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method", shape = "Site Scoring Method", linetype = "Site Scoring Method") +
   theme_bw() +
   theme(
     strip.text = element_text(size = 8, margin = margin(t = 5, r = 5, b = 5, l = 5)),
     axis.text = element_text(size = 8),
+    axis.text.x = element_text(angle = 45, hjust = 1),
     axis.title = element_text(size = 10),
     legend.text = element_text(size = 8),
     legend.title = element_text(size = 10),
