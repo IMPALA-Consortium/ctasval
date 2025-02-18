@@ -115,7 +115,7 @@ Here we demonstrate the efficiency in detecting anomalous sites using simulation
 
 > BK: I think we need to start with the problem statement, then sketch the ctas approach e.g:
 In a clinical trial patient data is typically collected as repeated measures over time, tracking pivotal health parameters of all patients during the course of a trial. As patients can enter the trial at different times and thus the individual length of each time series depends on the time that has passed since enrollment. The number of data points collected depends on how often a meassurement was collected and may contain missing values when assessments have been skipped. The actual values measured may also dependend on scheduled treatments and assessment as well as on disease progression. All of these factors complicate active SDM of ongoing trials.
-CTAS has been developed to only compare time series of the same lengths. It will actively comb throught the data and find as many groups of timeseries of equal length that fullfill a set of parametrized minimum requirements. Detailed parameter descriptions can be found in the project's public code repository (see Supplementary Material). Alternatively, time series can also be defined manually including fixed sets of visits. CTAS expects measurements to be numerical, thus any categorical values need to be transformed to an appropriate numerical format. CTAS will then calculate a set of relevant aggregate features for each time series which can then be used to identify site and subject outliers.
+CTAS has been developed to only compare time series composed of the same time points. It will actively comb throught the data and find as many groups of timeseries of equal length that fullfill a set of parametrized minimum requirements. Detailed parameter descriptions can be found in the project's public code repository (see Supplementary Material). Alternatively, time series can also be defined manually including fixed sets of visits. CTAS expects measurements to be numerical, thus any categorical values need to be transformed to an appropriate numerical format. CTAS will then calculate a set of relevant aggregate features for each time series which can then be used to identify site and subject outliers.
 
 
 The starting point of CTAS is a set of clinical trial data. Reprocessing the data into a format accepted by CTAS is required as first step. Details on the CTAS data format are described at the project Github repository.
@@ -148,14 +148,18 @@ Each time series is characterized by a set of time series features, which summar
 
 > BK: Should we set consistent order for features in bullet points and figures?
 
-- Average Value
-- Standard Deviation
-- Range
-- Unique Value Ratio (Number of unique values divided by number of values available)
-- Autocorrelation (Correlation with preceeding value)
-- Local Outlier Factor (Local deviation of a given data point with respect to its neighbours) @breunig_lof_2000
+| Feature type | Examples of an anomaly detected with the feature |
+| Average value | Issues with device calibration for local labs where results are systematically lower or larger due to incorrect measurements. |
+| Standard Deviation | Large fluctuations in liver enzymes which could be due to a safety reason. |
+| Range | Time series with one large peak due to an incorrect original unit assignment. |
+| Unique Value Ratio (Number of unique values divided by number of values available) | 
+| Autocorrelation | Unexpected linear time series (autocorrelation close to 1) which can be due to the site adding a constant value to the previous measurement. |
+| Local Outlier Factor (LOF) | LOF values greater than one indicate patterns very different from other subjects. In the other extreme, sites where all subjects have LOF values close to one might not have made all the measurements but entering plausible values within ranges of normal. |
 
-> BK: the illustration lacks range and local outlier factor
+All feature types except LOF are context-free meaning that only measurements in the time series are needed to calculate them. LOF on the other hand is context-dependent as its value depends also on the other time series in the study.
+
+It is important also to note that some features type correlate, e.g. Range and Standard Deviation. To limit duplication
+of signals, it is advisable to use only range or standard deviation.
 
 For an illustration of features for a time series, please see @fig-timeseries-feats.
 
@@ -170,7 +174,7 @@ Sites are flagged based on the bias in their time series feature values versus o
 
 The Kolmogorov-Smirnov (K-S) statistical test compares time series feature values of individual sites against the combined values from all other sites. This non-parametric test evaluates the null hypothesis that the feature values from a specific site and the feature values from all other sites are drawn from the same distribution. @schroer_exact_1995
 
-The K-S test calculates the maximum difference between the empirical cumulative distribution functions (ECDFs) of the two samples, providing a D-statistic and a p-value for each comparison. The p-value indicates the significance of the difference between the distributions. A low p-value suggests that the feature values from the site are significantly different to those from other sites, potentially indicating an anomaly.
+The K-S test calculates the maximum difference between the empirical cumulative distribution functions (ECDFs) of the two samples, providing a D-statistic and a p-value for each comparison. The p-value indicates the significance of the difference between the distributions. A low p-value suggests that the feature values from the site are significantly different to those from other sites, potentially indicating an anomaly. The uncorrected p-value produced by the K-S test is further corrected with the FDR method to account for multiple testing.
 
 > BK: I think this can be removed and is sufficiently explained by the similar pragraph in the next section
 It is important to note that, unlike the mixed effects model, the K-S test does not implicitly account for region and country-level demographic factors that might affect site scoring. For example, demographic differences such as lower body weight in East Asian countries could lead to sites from these regions being flagged for lower body weight than expected. This limitation should be considered when interpreting the results, as demographic factors may contribute to the observed differences in feature values.
@@ -198,6 +202,10 @@ The primary advantage of this method is its simplicity and ease of understanding
 In addition to flagging sites, the results are valuable for identifying individual subjects with anomalous time series. Sites which exhibit no systematic bias might still contain individual anomalous subjects and time series. One way is to visually inspect similarity plots for subjects with few near neighbors. @fig-similarity-plot gives an example of this for an anomalous weight profile. Another approach is to compare time series features and review time series with extreme values for one or more of these. Please see @fig-sd-example for an example on this. Please note that outliers identified with the two approaches often correlate, e.g., subjects with unusually high standard deviations also tend to be outliers on the similarity plot.
 
 > BK !! We need a section on p-values estimation and multiplicity correction, this then should also adress FC's comment below.
+
+### P-value calculation and correction for multiple testing
+
+
 
 ## Validation
 
