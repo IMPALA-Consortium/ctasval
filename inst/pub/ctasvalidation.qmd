@@ -33,6 +33,8 @@ suppressPackageStartupMessages(library(tidyr))
 suppressPackageStartupMessages(library(tibble))
 suppressPackageStartupMessages(library(here))
 suppressPackageStartupMessages(library(patchwork))
+suppressPackageStartupMessages(library(ctasval))
+suppressPackageStartupMessages(library(gt))
 
 here::i_am("inst/pub/ctasvalidation.qmd")
 
@@ -50,7 +52,7 @@ theme_ctas <- function() theme_bw(base_size = 9)
 
 for references add the doi link, I will add those to the `ctas.bib` file.
 
-# Title page (required section)
+# Title page
 
 > The running head for a manuscript will be the shortened manuscript title followed by an ellipsis.
 
@@ -78,83 +80,37 @@ CTAS is a valuable tool for timely detection of outliers in clinical data, suita
 
 RBQM, SDM, time series, anomaly, clinical trial, outlier
 
-> The journal will publish 5-6 keywords. However, to ensure that your manuscript is easily searchable in PubMed and other repositories, be sure to include any relevant keywords in the title or abstract of your manuscript.
-
-> BK: Glossary
-- time series: one line of measurements over time, in this context subject-level 
-- time series group: group of time series of the same length
-- time series feature: summary metric of all values of a single time series
-- measurement: a subject level measurement taken in a clinical trial
-- measurement type: AST, Creatinine, weight, ...
-- parameter: ctas algorithm parameters
-
 
 # Introduction (required section)
 
-> The introduction should assume that the reader is knowledgeable in the field and should therefore be brief; it can include a short historical review where desirable. It should also include the study objective.
-
 Most clinical trial data consist of repeated measurements taken of the same patients over the duration of the trial. The integrity of these data points is mostly challenged by systemic errors introduced at site level which can have root causes such as: misinterpretation of the protocol, miscalibration of laboratory tests or devices, insufficient staff training and many more. These errors will affect a larger portion of patients enrolled at the site and should be statistically detectable as site-level anomalies given that sufficient compliant data has been collected within the current trial data set. Classical risk mitigation strategies consist of a combination of monitoring activities such as source data verification (SDV) and source data review (SDR), programmed data management edit checks and medical data review.
 
-Ensuring the high quality of data is a major responsibility of the clinical trial sponsor. Current ICH guidelines recommended a risk-based statistical approach to monitor the completeness, expected range and variability of the clinical trial data @noauthor_ich_1997 So called central monitoring activities are part of the risk-based quality monitoring (RBQM) framework one of which is statistical data monitoring (SDM).
+Ensuring the high quality of data is a major responsibility of the clinical trial sponsor. Current ICH guidelines, e.g. ICH E6 (R3), recommended a risk-based statistical approach to monitor the completeness, expected range and variability of the clinical trial data @noauthor_ich_1997. So called central monitoring activities are part of the risk-based quality monitoring (RBQM) framework one of which is statistical data monitoring (SDM).
 
-Subject-level data in clinical trial can be collected as categorical, ordinal or numerical data as a single measurement or as a time series. Typically all of these data types require different statistical tests. Consequently, statistical data monitoring tools execute a myriad of test @venet_statistical_2012, @kirkwood_application_2013, @trotta_detection_2019 and it has been shown that the application of such tools can improve data quality over time @de_viron_does_2024 Recently an RBQM open source solution focusing on the monitoring of site key risk indicators (KRI) has been published @wu_good_2024 but presently, no open source solution has been published aggregating central data monitoring methods into one tool.
+Subject-level data in clinical trial can be collected as categorical, ordinal or numerical data, as a single measurement or as a time series. Typically, all of these data types require different statistical tests. Consequently, statistical data monitoring tools execute a myriad of test @venet_statistical_2012, @kirkwood_application_2013, @trotta_detection_2019 and it has been shown that the application of such tools can improve data quality over time @de_viron_does_2024 Recently an RBQM open source solution focusing on the monitoring of site key risk indicators (KRI) has been published @wu_good_2024 but presently, no open source solution has been published aggregating central data monitoring methods into one tool.
 
-In this paper, we present an evaluation of Clinical Trial Anomaly Spotter (CTAS) - an open-source R package for the identification of anomalous time series collected during the study. The package was developed originally by Bayer, and later co-developed by the Intercompany Quality Analytics (IMPALA) consortium. IMPALA has currently 19 industry members and promotes the use and development of analytics for GxP quality assurance. CTAS fills the central statistical data monitoring gap of the current open source RBQM landscape. It has foremost been developed for the detection of anomalies in numerical time series data at site and subject level. CTAS strong focus on time series data ensures that only time series of the same length are being compared suppressing false positive signals.
+In this paper, we present an evaluation of Clinical Trial Anomaly Spotter (CTAS) - an open-source R package for the identification of anomalous clinical trial time series. The package was developed originally by Bayer, and later co-developed by the Intercompany Quality Analytics (IMPALA) consortium. IMPALA has currently 19 industry members and promotes the use and development of analytics for GxP quality assurance @menard_cross-company_2021. CTAS fills the central statistical data monitoring gap of the current open source RBQM landscape. It has foremost been developed for the detection of anomalies in numerical time series data at site and subject level. CTAS strong focus on time series data ensures that only time series of the same length are being compared suppressing false positive signals.
 
 Here we demonstrate the efficiency in detecting anomalous sites using simulations based on data from 15 clinical trials donated by three of the IMPALA member companies.
 
 # Methods (required section)
 
-> This section should contain sufficient detail, so that all experimental procedures can be reproduced, and include references. Methods, however, that have been published in detail elsewhere should not be described in detail. Authors should provide the name of the manufacturer and their location for any specifically named equipment and instruments, and all drugs should be identified by their pharmaceutical names, with their trade name, if relevant, in parentheses following, at first use. Please carefully read the "Editorial Policies" section for information about animal handling, informed consent, and IRB approval.
-
 ## Algorithm
 
-> BK: Consider "Clinical Trial Time Series"
+### Clinical Trial Time Series
 
-### Processing Time Series
 
-> BK: I think we need to start with the problem statement, then sketch the ctas approach e.g:
-In a clinical trial patient data is typically collected as repeated measures over time, tracking pivotal health parameters of all patients during the course of a trial. As patients can enter the trial at different times and thus the individual length of each time series depends on the time that has passed since enrollment. The number of data points collected depends on how often a meassurement was collected and may contain missing values when assessments have been skipped. The actual values measured may also dependend on scheduled treatments and assessment as well as on disease progression. All of these factors complicate active SDM of ongoing trials.
+In a clinical trial patient data is typically collected as repeated measures over time, tracking pivotal health measurements of all patients during the course of a trial. As patients can enter the trial at different times and thus the individual length of each time series depends on the time that has passed since enrollment. The number of data points collected depends on how often a meassurement was collected and may contain missing values when assessments have been skipped. The actual values measured may also dependend on scheduled treatments and assessment as well as on disease progression. All of these factors complicate active SDM of ongoing trials.
 CTAS has been developed to only compare time series composed of the same time points. It will actively comb throught the data and find as many groups of timeseries of equal length that fullfill a set of parametrized minimum requirements. Detailed parameter descriptions can be found in the project's public code repository (see Supplementary Material). Alternatively, time series can also be defined manually including fixed sets of visits. CTAS expects measurements to be numerical, thus any categorical values need to be transformed to an appropriate numerical format. CTAS will then calculate a set of relevant aggregate features for each time series which can then be used to identify site and subject outliers.
-
-
-The starting point of CTAS is a set of clinical trial data. Reprocessing the data into a format accepted by CTAS is required as first step. Details on the CTAS data format are described at the project Github repository.
-
-The user is free to include data from any data domain as long as the data is numerical. It is also left to the discretion of the user to either only analyze study critical parameters such as those related to safety and endpoints or to search for anomalies in all numerical data collected within the study.
-
-The CTAS input arguments give the user plenty of flexibility in defining time points that constitute a time series. Alternatively, the package can be given the freedom of defining time series in a data-driven manner. Additionally, the arguments can be used to restrict the time series features calculated (more details below) and choose the site-scoring method (also, see below).
 
 #### Defining Time Series
 
-> BK: proposition with more detail:
 In an ongoing study, some subjects might have only taken the first visits while some have already finished the study. This is the reason why more than one group of time series with various length per parameter should be defined. One group would include almost all planned time points and compares subjects which have largely finished the trial. Another shorter group includes only the first few visits to also include subjects which have only lately been enrolled. As illustrated in @fig-timeseries-def individual subject data points may also be missing. These time series groups can be manually defined or CTAS will start to iteratively look for suitable groups starting with the longest possible group and decrease the length if the number of eligable subjects can be increased by at least 20 percent. A time series group should have a minimum group size which can be set via a CTAS parameter, we currently recommend a minimum group size of 25 subjects.
-Eligable subjects must also not exceed the maximum ratio of missing values, which is another CTAS parameter for which the recommendation is 30%. Traditionally, time series should have at least three data point, however some measurements will only be taken once possibly during screening. Therefore CTAS also allows time series of length one, altough not all subsequent time series features e.g. autocorrelation (see the following section) will be meaningfull. 
-
-
-
-
-By default, a time series must have at least three time points, there must be at least three eligible subjects per time series, and a subject can have at most half of time points missing. These parameters can of course be changed by the user to fit the characteristics of the trial better.
-
-The user can also have baseline-adjusted time series generated if baseline values are defined.
-
-
-In an ongoing study, some subjects might have only taken the first visits while some have already finished the study. This is the reason why more than one time series per parameter can be defined. For example, one time series would include almost all planned time points and would be useful for comparing sites and subjects which have largely finished the trial. Another time series might focus on the first few visits to also include subjects which have only lately been enrolled. @fig-timeseries-def gives a simplified example of a set of two time series defined for a parameter.
-
-
+Eligable subjects must also not exceed the maximum ratio of missing values, which is another CTAS parameter for which the recommendation is 30%. Traditionally, time series should have at least three data point, however some measurements will only be taken once possibly during screening. Therefore CTAS also allows time series of length one, altough not all subsequent time series features e.g. autocorrelation (see the following section) will be meaningfull.
 
 #### Timeseries Features
 
-Each time series is characterized by a set of time series features, which summarize all time series values into a single metric. These features are central to the algorithm as they are used to flag anomalous sites (see below). In addition, the features can be used to identify individual subjects with peculiar time series. Currently available time series features consist of:
-
-> BK: Should we set consistent order for features in bullet points and figures?
-
-| Feature type | Examples of an anomaly detected with the feature |
-| Average value | Issues with device calibration for local labs where results are systematically lower or larger due to incorrect measurements. |
-| Standard Deviation | Large fluctuations in liver enzymes which could be due to a safety reason. |
-| Range | Time series with one large peak due to an incorrect original unit assignment. |
-| Unique Value Ratio (Number of unique values divided by number of values available) | 
-| Autocorrelation | Unexpected linear time series (autocorrelation close to 1) which can be due to the site adding a constant value to the previous measurement. |
-| Local Outlier Factor (LOF) | LOF values greater than one indicate patterns very different from other subjects. In the other extreme, sites where all subjects have LOF values close to one might not have made all the measurements but entering plausible values within ranges of normal. |
+Each time series is characterized by a set of time series features, which summarize all time series values into a single metric. These features are central to the algorithm as they are used to flag anomalous sites (see below). In addition, the features can be used to identify individual subjects with peculiar time series. Currently available time series features are listed in @tbl-features.
 
 All feature types except LOF are context-free meaning that only measurements in the time series are needed to calculate them. LOF on the other hand is context-dependent as its value depends also on the other time series in the study.
 
@@ -165,19 +121,15 @@ For an illustration of features for a time series, please see @fig-timeseries-fe
 
 ### Flagging Sites
 
-
 Flagging sites with a systematic bias in their data collection is an important part of study monitoring. If identified early enough, the site can be offered further training if the site has had trouble in interpreting the study protocol. In the extreme case, if the bias is due to intentional misconduct, the site can be closed and excluded from analysis.
 
 Sites are flagged based on the bias in their time series feature values versus other sites in the study. CTAS offers three options for flagging sites: Kolmogorov-Smirnov, mixed effects modelling and the simple average of the feature values.
 
 #### Kolmogorov-Smirnov
 
-The Kolmogorov-Smirnov (K-S) statistical test compares time series feature values of individual sites against the combined values from all other sites. This non-parametric test evaluates the null hypothesis that the feature values from a specific site and the feature values from all other sites are drawn from the same distribution. @schroer_exact_1995
+The Kolmogorov-Smirnov (K-S) statistical test compares time series feature values of individual sites against the combined values from all other sites. This non-parametric test evaluates the null hypothesis that the feature values from a specific site and the feature values from all other sites are drawn from the same distribution @schroer_exact_1995.
 
-The K-S test calculates the maximum difference between the empirical cumulative distribution functions (ECDFs) of the two samples, providing a D-statistic and a p-value for each comparison. The p-value indicates the significance of the difference between the distributions. A low p-value suggests that the feature values from the site are significantly different to those from other sites, potentially indicating an anomaly. The uncorrected p-value produced by the K-S test is further corrected with the FDR method to account for multiple testing. @benjamini_hochberg_1995
-
-> BK: I think this can be removed and is sufficiently explained by the similar pragraph in the next section
-It is important to note that, unlike the mixed effects model, the K-S test does not implicitly account for region and country-level demographic factors that might affect site scoring. For example, demographic differences such as lower body weight in East Asian countries could lead to sites from these regions being flagged for lower body weight than expected. This limitation should be considered when interpreting the results, as demographic factors may contribute to the observed differences in feature values.
+The K-S test calculates the maximum difference between the empirical cumulative distribution functions (ECDFs) of the two samples, providing a D-statistic and a p-value for each comparison. The p-value indicates the significance of the difference between the distributions. A low p-value suggests that the feature values from the site are significantly different to those from other sites, potentially indicating an anomaly. The uncorrected p-value produced by the K-S test is further corrected with the FDR method to account for multiple testing @benjamini_controlling_1995.
 
 @fig-site-flagging gives an example on how the method is used to identify a site with relatively few unique values per time series.
 
@@ -185,30 +137,22 @@ It is important to note that, unlike the mixed effects model, the K-S test does 
 
 This approach allows us to account for both fixed and random effects in the data, providing a robust framework for detecting anomalies.
 
-We fit a mixed effects model to the data, where the hierarchical structure of the data is taken into account by including random effects for different levels (i.e., sites nested within countries and regions). After fitting the model, we simulate the random effects to obtain estimates for each entity (sites, countries, and regions). For each entity, we calculate the median and standard deviation of the random effects. Additionally, the median and standard deviation are used to calculate a p-value for each entity's deviation from zero, providing a statistical measure of the significance of the abnomaly. Like in the K-S test, this raw p-value is further adjusted with the FDR method. @benjamini_hochberg_1995
+We fit a mixed effects model to the data, where the hierarchical structure of the data is taken into account by including random effects for different levels (i.e., sites nested within countries and regions). After fitting the model, we simulate the random effects to obtain estimates for each entity (sites, countries, and regions). For each entity, we calculate the median and standard deviation of the random effects. Additionally, the median and standard deviation are used to calculate a p-value for each entity's deviation from zero, providing a statistical measure of the significance of the abnomaly. Like in the K-S test, this raw p-value is further adjusted with the FDR method @benjamini_controlling_1995.
 
 One significant advantage of using mixed effects models in this context is their ability to account for region-level and country-level demographic factors when scoring sites. By incorporating these higher-level random effects, the model can more accurately detect site-specific biases while controlling for broader demographic influences. This approach provides a comprehensive understanding of potential biases across different study sites, countries, and regions.
 
 #### Average feature value
 
-As a simple baseline model for anomaly detection, we also scored sites based on the average feature values of the subjects at each site. Then outlier were defined as being outside of the interquartile range multiplied by 1.5. This straightforward approach involves calculating the mean feature value for each site and using these averages to identify potential anomalies. It is included in order to have a benchmark to see if the more complex site flagging methods are able to outperform it. Note that the method does not produce a p-value but a binary outcome on whether the site is an outlier or not.
+As a simple baseline model for anomaly detection, we also scored sites based on the average feature values of the subjects at each site. Then outlier were defined as being outside of the interquartile range multiplied by 1.5 @vinutha_detection_2018. This straightforward approach involves calculating the mean feature value for each site and using these averages to identify potential anomalies. It is included in order to have a benchmark to see if the more complex site flagging methods are able to outperform it. Note that the method does not produce a p-value but a binary outcome on whether the site is an outlier or not.
 
 The primary advantage of this method is its simplicity and ease of understanding. It provides a clear and straightforward way to identify sites with unusual feature values. However, this approach does not take into account the size of the site. A site with only one subject who has an extreme feature value may get flagged, even though this could be due to chance alone and may not indicate a systematic issue with the site. Like the Kolmogorov-Smirnov approach, this method does not account for region and country-level demographic factors that might influence feature values.
 
-### Identifying Anomalies in Individual Time
-
-> BK: consider removing this sections if we run out of space, as we do not include it in validation FC: agree, not in focus of this publication
+### Identifying Anomalies in Individual Time Series
 
 In addition to flagging sites, the results are valuable for identifying individual subjects with anomalous time series. Sites which exhibit no systematic bias might still contain individual anomalous subjects and time series. One way is to visually inspect similarity plots for subjects with few near neighbors. @fig-similarity-plot gives an example of this for an anomalous weight profile. Another approach is to compare time series features and review time series with extreme values for one or more of these. Please see @fig-sd-example for an example on this. Please note that outliers identified with the two approaches often correlate, e.g., subjects with unusually high standard deviations also tend to be outliers on the similarity plot.
 
-> BK !! We need a section on p-values estimation and multiplicity correction, this then should also adress FC's comment below.
-
 
 ## Validation
-
-> FC: For the Kolmogorov-Smirnov test this would amount roughly to a 6,8% confidence level. Do we need to add the siginificance level of the tests?
-> BK 
-
 
 To evaluate CTAS performance for detecting sites with anomalous time series we selected data from two laboratory (Alanine Aminotransferase, Creatinine) and two vitals measurements (Systolic Blood Pressure, Weight) from a clinical trial data set and reassigned all patients to different sites creating a synthetic data set closely following actual trial outcomes and schedules but also removing all regional or country-specific signal. Further we removed data points from unscheduled visits and data from screening failures. In total, 15 completed studies were selected from 3 different IMPALA members in triplicates with comparable patient and site number.
 
@@ -221,30 +165,28 @@ For time series features calculated by CTAS we applied a specific transformation
 -   Autocorrelation: Add the preceeding value multiplied by the anomoly degree to each value.
 -   Local outlier factor: Transform data for each patient by a randomly chosen non-normal distribution. The anomaly degree would determine the ratio of affected patients.
 
-The anomalies introduced are visualized in @fig-anomalies based on a simulated sdtm test data set @pharmaversesdtm.
+The anomalies introduced are visualized in @fig-anomalies based on a simulated sdtm test data set. @mancini_pharmaversesdtm_2025
 
 Subsequently we tried to detect the three anomalous sites using different site scoring methods among the compliant sites in the study data set. We set the minimum time series length to one and required at least 25 patients per time series group with a maximum ratio of missing values of 30% per subject. For each site we used the highest CTAS score and employed a threshold of 1.3 if applicable. This was repeated a 100 times and true positive rate (TPR) and false positive rate (FPR) were calculated using the combined results.
 
-# Results (required section)
+# Results
 
-We tested three different scoring methods to detect six types of site anomalies introduced at varying degrees across 15 study data sets, donated by three different IMPALA members, and measured using four different parameters. The resulting average True Positive Rate (TPR, also known as Recall) and False Positive Rate (FPR), along with their respective standard deviations, were plotted in @fig-results. The figure shows that TPR rates generally increase with higher anomaly rates, while the FPR either remains flat or slightly decreases as the degree of anomaly increases.
+We tested three different scoring methods to detect six types of site anomalies introduced at varying degrees across 15 study data sets, donated by three different IMPALA members, with 4 measurement types (Alanine Aminotransferase, Creatinine, Systolic Blood Pressure, Weight). The resulting average True Positive Rate (TPR, also known as Recall) and False Positive Rate (FPR), along with their respective standard deviations, were plotted in @fig-results. The figure shows that TPR rates generally increase with higher anomaly rates, while the FPR either remains flat or slightly decreases as the degree of anomaly increases.
 
-Among the three site flagging methods, we observed that the average method achieved the highest TPR, detecting almost all high-degree anomalies. However, it also had significantly higher FPR rates compared to the Kolmogorov-Smirnov (KS) method and Mixed Effects Modeling. The KS method had the lowest TPR but almost zero FPR. Mixed Effects Modeling demonstrated the best overall performance, with a TPR surpassing that of the KS method and a negligible rate of false positives.
+Overall, the mixed effects modeling method emerged as the most robust approach for detecting site-level anomalies, providing a good balance between high TPR and low FPR. The average feature value method, while effective in identifying true positives, was less reliable due to its high false positive rate. 
 
-We did not observe strong differences between the four different parameters. Some parameters were more susceptible to anomalies, resulting in higher TPR at lower anomaly degrees. This is expected, as anomalies were introduced by multiplying existing measurements, which are more sensitive to higher starting values. An exception was the weight metric, for which the CTAS tool achieved a TPR of less than 50% when detecting unique value outliers. This discrepancy is likely due to the high frequency of rounding in weight results in studies, leading to fewer unique values per time series compared to other parameters like laboratory measurements. This finding underscores the importance of considering the nature of the data when interpreting the performance of anomaly detection methods.
+Among the three site flagging methods, we observed that the average feature value method achieved the highest TPR, detecting almost all high-degree anomalies. However, it also had significantly higher FPR rates compared to the Kolmogorov-Smirnov (KS) method and mixed effects modeling. The KS method had the lowest TPR but almost zero FPR. Mixed Effects Modeling demonstrated the best overall performance, with a TPR surpassing that of the KS method and a negligible rate of false positives.
 
-> BK: I would expect autocorr and unique_value_count FPR to be similar as both values max out at 1. Maybe when we get the combined results. I will do some EDA on the lof.
+We did not observe strong differences between the four different measurement types. Some were more susceptible to anomalies, resulting in higher TPR at lower anomaly degrees. This is expected, as anomalies were introduced by multiplying existing measurements, which are more sensitive to higher starting values. 
 
-Autocorrelation and local outlier factor anomalies, which are more complex, were also difficult to detect. We barely detected half of the introduced outliers. 
+Further, we observed an overall decrease in the TPR for weight, specifically for the unique value ratio and autocorrelation anomalies. Weight measurements are unique because three out of 15 studies had only one planned weight measurement per patient. Autocorrelation and unique value count ratio require longer time series to become detectable and cannot be introduced into a time series of length one. On top of that weight results tend to have a high frequency of rounding, leading to fewer unique values per time series. TPR for weight for the other anomaly time series pairs is not affected by these specific characteristics of weight measurements.
 
-Overall, the Mixed Effects Modeling method emerged as the most robust approach for detecting site-level anomalies, providing a good balance between high TPR and low FPR. The average feature value method, while effective in identifying true positives, was less reliable due to its high false positive rate. 
+This underscores the importance of considering the nature of the data when interpreting the performance of anomaly detection methods.
 
-> BK not sure about those statements as high SD shows high variance between studies
-The performance of the CTAS tool was consistent across different studies. Feature-specific analysis revealed challenges in detecting anomalies in autocorrelation and unique value counts for weight parameters, suggesting areas for further refinement in the anomaly detection process.
+Autocorrelation and LOF anomalies are conceptually more complex than the other time series feature anomaly pairs. Even though the anomalies introduced were extreme, they could not always be detected by an increase in the time series features of the anomalous sites. Using the mixed effect site flagging method, we detected fewer than 50% of all anomalous sites.
 
-# Discussion (required section)
 
-> The Discussion should focus on the interpretation and the significance of the findings with concise objective comments that describe their relation to other work in the area. It should not repeat information in the results.
+# Discussion
 
 Altogether this evaluation of the CTAS algorithm has shown that site-level timeseries anomalies can be detected by comparing summary statistics of individual timeseries from one site against those obtained from all other patients from the study. Of all tested site flagging methods mixed effect modelling has shown the most robust TPR FPR trade-off. In practice mixed effect modelling will also control for regional and country effects that were removed in our validation data sets, further decreasing FPR.
 
@@ -254,43 +196,33 @@ In general small samples tend to have a higher variability than large samples. T
 
 The ratio of small sites with less than 3 patients in an average study can be quite high and has been roughly 20% in the investigated studies. The overall maximum performance depends on how well these sites can be detected therefore we chose not to exclude any sites although others have excluded sites with only one patient @trotta_detection_2019. This is why we see a lower maximum TPR when using the Kolmogorov-Smirnov site scoring method because it uses a rank-based test that is somewhat indifferent to the magnitude of the outlier. The mixed effect model scoring method also employed by other methods @desmet_linear_2014 @trotta_detection_2019 accounts for sample number and magnitude but assumes a normal distribution and has an increased FPR compared to the non-parametric Kolmogorov-Smirnov method. To account for the lower TPR that can be expected for small site we recommend to also check for patient-level outliers using similarity plot as depicted in @fig-similarity-plot.
 
-Sample-size induced variability can also be introduced by differences in the number of subject visits. Some measurements will also depend on procedures planned at different visits determined by the study protocol thus different values can be expected for early screening visits compared to late follow up visits. CTAS controls for this by only comparing summary metrics from time series with the same length. Thus CTAS avoids errors introduced by comparing aggregates from samples of different sizes and variability introduced by the study protocol.
+Sample-size induced variability can also be introduced by differences in the number of subject visits. Some measurements will also depend on procedures planned at different visits determined by the study protocol thus different values can be expected for early screening visits compared to late follow up visits. CTAS controls for this by only comparing summary metrics from time series composed of the same time points. Thus CTAS avoids errors introduced by comparing aggregates from samples of different sizes and variability introduced by the study protocol.
 
+We have picked four different measurement types (Alanine Aminotransferase, Creatinine, Systolic Blood Pressure, Weight) across 15 studies to investigate the variability of the results. We did observe slightly different TRP rates across the different anomalies that were introduced. Weight was standing out in particular as the FPR was reduced for unique value ratio and autocorrelation. We attribute this to a prevalance of rounding and that three out of 15 studies only had 1 planned weight measurement per patient. Nevertheless other anomalies could be efficiently detected.
 
+The most complex anomalies introduced were autocorrelation and LOF their corresponding TPR rates were comparatively low when compared to the other anomalies. Even though extreme values were introduced we could not detect the corresponding elevated time series feature values among the signal of the unaltered time series. This shows a high level of noise that is present in the test data sets in regard to those time series features.
 
-> BK: Maybe we could have a paragraph discussing time series length here. But so far I do not understand it well myself.
+In practice extreme values in the data set will not only chance one but many time series features. Thus there is a good change that anomalies in the data will create multiple signals that complement each other. CTAS does not try to preemptively select the most appropriate statistical test for a given measurement type and time series length. Therefore all timeseries features should always be measured across all timeseries to cast a wide net for detecting anomalies. 
 
-While the number of patients at a site is an important factor that determines whether site anomalies can be statistically detected the length of the individual time series is also important.
+CTAS does not offer built-in native support for categorical, ordinal and date type data they can be transformed to a numerical data type before running CTAS. This is expected to provide similar results as specifically adapted tests for these data types although this remains to be tested but would require a different strategy for introducing anomalies which would exceed the scope of this work.
 
-The explanation here is that the majority of the studies only measured weight during screening. For a time series of length one all patients will have a relative unique value count of 1.
-
-Local outlier factor creates a multidimensional distance metric that is hard to emulate artificially. Nevertheless the approach to transform patients measurement by a random non-normal distribution could increase the distance of the anomalous site to the rest of the data set to some extend. And CTAS was able to detect around 50% of the anomalous sites.
-
-Nevertheless all 6 summary metrics collected by CTAS complement each other and any site-level anomaly will affect more than one metric.
-
-Although CTAS does not offer built-in native support for categorical, ordinal and date type data they can be transformed to a numerical data type before running CTAS. This is expected to provide similar results as specifically adapted tests for these data types although this remains to be tested but would require a different strategy for introducing anomalies which would exceed the scope of this work.
-
-# Conclusion (required section)
-
-> The conclusions section should highlight the main conclusion(s), stating the answer to the study objective. The Conclusions section should be a distinct section.
+# Conclusion
 
 Current regulatory guidelines promote the use of risk based quality monitoring (RBQM) in clinical trials to support traditional onsite monitoring, medical review and data management.
 
-We have demonstrated that the CTAS algorithm can be used to detect site-level anomalies of various kinds and that its accuracy increases the more extreme the anomalies become. Within an RBQM framework CTAS can be used to screen a clinical data set for site anomalies and target those for manual data review. The higher the score the more likely a site is to represent a genuine outlier that can be confirmed in a time series data visualization. The algorithm can be adapted to all data types covering the entire clinical data set, blind spots not covered by manual risk mitigation strategies can be avoided, possible unforeseen scenarios missed by first line control activities (programmed edit checks) can be detected.
+We have demonstrated that the CTAS algorithm can be used to detect site-level anomalies of various kinds and that its accuracy increases the more extreme the anomalies become. Within an RBQM framework, CTAS can screen clinical data for site anomalies and flag cases for manual review. The higher the score the more likely a site is to represent a genuine outlier that can be confirmed in a time series data visualization. The algorithm can be adapted to all data types covering the entire clinical data set, blind spots not covered by manual risk mitigation strategies can be avoided, possible unforeseen scenarios missed by first line control activities (programmed edit checks) can be detected.
 
-Similar tools have been shown to improve data quality over time @de_viron_does_2024 with CTAS having the advantage of being better adapted to time series data. The CTAS R package is also available as an open source R package and provides greater transparency as individual in-sourced solutions. We aim to promote the adoption of CTAS among IMPALA's 19 industry members and to drive the compatibility with other open source RBQM tools @wu_good_2024.
+Similar tools have been shown to improve data quality over time @de_viron_does_2024. CTAS having the advantage of being better adapted to time series data. The CTAS R package is also available as an open source R package and provides greater transparency as individual in-sourced solutions. By promoting the adoption of CTAS among IMPALA's 19 industry members and enhancing compatibility with other open-source RBQM tools @wu_good_2024, we aim to contribute to the advancement of robust, transparent site anomaly detection in clinical trials.
 
-# Funding statements (required section)
+# Funding statements
 
-> The Funding section is mandatory. Authors must declare sources of study funding including sponsorship (e.g. university, charity, commercial organization) and sources of material (e.g. novel drugs) not available commercially. See the Editorial Policy section for detailed information and requirements on this section. This section should also include, if desired, special thanks or dedications. Work done by a contributor or medical writer that does not qualify him/her for authorship, but which warrants acknowledgement, should be noted here.
 
 No specific funding was provided for the writing of this paper. The IMPALA (Inter coMPany quALity Analytics) Consortium provided funding for the Open Access fees.
 
-# Author Contributions (required section)
+# Author Contributions
 
 PT designed the CTAS algorithm, and wrote the R package. All authors participated in the validation and debugging of CTAS and wrote the manuscript. All authors read and approved the final version.
 
-> A statement outlining each author's contributions is mandatory. In order to meet requirements of authorship, each author must have contributed to at least one of the aspects below. The ICMJE and Therapeutic Innovation & Regulatory Science considers authorship to be based on the following four criteria:  Substantial contributions to the conception or design of the work; or the acquisition, analysis, or interpretation of data for the work; and  Drafting the work or revising it critically for important intellectual content; and  Final approval of the version to be published; and  Agreement to be accountable for all aspects of the work in ensuring that questions related to the accuracy or integrity of any part of the work are appropriately investigated and resolved. Additional information can be found under "Authorship." As per ICMJE best practice, information provided in this section is the responsibility of the authors.
 
 # Figure Legends
 
@@ -321,9 +253,7 @@ PT designed the CTAS algorithm, and wrote the R package. All authors participate
 
 @fig-results True positive and false positive ratio across different simulation scenarios. Ratios are represented as the mean with standard deviation obtained by 15 replicates obtained from simulations based on different studies. Timelines from two laboratory (Alanine Aminotransferase, Creatinine) and 2 vitals mesurements (Systolic Blood Pressure, Weight) were selected to be included in the simulation. The simulations randomly introduced 3 anomalous sites with increasing anomaly degrees into each iteration which needed to be detected by the CTAS algorithm. Study-level ratios were based on simulations with 100 iterations.
 
-# Tables
 
-> These should be labeled sequentially as Table 1, Table 2, etc. Each table should be typed on a separate page, numbered and titled, and cited in the text. Reference to table footnotes should be made by means of Arabic numerals. Tables should not duplicate the content of the text. They should consist of at least two columns; columns should always have headings. Authors should ensure that the data in the tables are consistent with those cited in the relevant places in the text, totals add up correctly, and percentages have been calculated correctly. Tables may be either included in the article file itself, but at the end of the manuscript, or supplied as separate files.
 
 # Figures
 
@@ -351,13 +281,23 @@ PT designed the CTAS algorithm, and wrote the R package. All authors participate
 ![Example Standard Deviation](sd_example.png){#fig-sd-example}
 
 
+```{r echo=FALSE}
+anomaly_names <- c(
+      "Average",
+      "Standard Deviation",
+      "Range",
+      "Unique Value Ratio",
+      "Auto Correlation",
+      "Local Outlier Factor"
+    )
+```
+
+
 ```{r echo=FALSE, fig.width=10, fig.height=9, warning=FALSE, message=FALSE}
 #| label: fig-anomalies
 #| fig-cap: "Anomalies"
 
 set.seed(1)
-suppressPackageStartupMessages(library(ggplot2))
-suppressPackageStartupMessages(library(ctasval))
 
 df_prep <- prep_sdtm_lb(pharmaversesdtm::lb, pharmaversesdtm::dm, scramble = TRUE)
 
@@ -378,24 +318,16 @@ set_seed <- function(fun, seed = 1){
   }
 }
 
-
 df_anomaly <- tibble(
     anomaly_fun = list(
-      anomaly_autocorr2,
       anomaly_average,
-      anomaly_lof,
-      anomaly_range,
       anomaly_sd,
-      anomaly_unique_value_count_relative
+      anomaly_range,
+      anomaly_unique_value_count_relative,
+      anomaly_autocorr2,
+      anomaly_lof
     ),
-    anomaly = c(
-      "Auto Correlation",
-      "Average",
-      "Local Outlier Factor",
-      "Range",
-      "Standard Deviation",
-      "Unique Value Ratio"
-    )
+    anomaly = anomaly_names
   ) %>%
   mutate(
     anomaly_degree = list(c(0.25, 0.5, 0.75, 1, 5, 10))
@@ -414,6 +346,7 @@ df_anomaly <- tibble(
     .by = subject_id
   )
 
+
 df_filt_exp <- df_filt %>%
   mutate(
     anomaly = list(unique(df_anomaly$anomaly))
@@ -423,6 +356,8 @@ df_filt_exp <- df_filt %>%
     result = ifelse(anomaly == "Unique Value Ratio" & result > 250, NA, result)
   )
 
+df_anomaly$anomaly <- factor(df_anomaly$anomaly, levels = anomaly_names)
+df_filt_exp$anomaly <- factor(df_filt_exp$anomaly, levels = anomaly_names)
 
 ggplot(df_filt_exp, aes(x = timepoint_rank, y = result, group = subject_id)) +
   geom_line(color = "darkgrey", alpha = 0.5) +
@@ -433,16 +368,12 @@ ggplot(df_filt_exp, aes(x = timepoint_rank, y = result, group = subject_id)) +
   theme_ctas() +
   theme(legend.position = "bottom") +
   labs(x = "Timepoint Rank", y = "Alkaline Phosphatase U/L", shape = "")
-  
 
 ```
 
 ```{r results, echo=FALSE, warning=FALSE, message=FALSE}
 
-# Load necessary libraries
-library(ggplot2)
-library(dplyr)
-library(tidyr)
+
 path <- here::here("inst/pub/")
 
 
@@ -485,7 +416,8 @@ df_tpr <- df_long %>%
   mutate(
     ymin = value - sd_value,
     ymin = ifelse(ymin < 0, 0, ymin),
-    ymax = value + sd_value
+    ymax = value + sd_value,
+    ymax = ifelse(ymax > 1, 1, ymax)
   )
 
 df_fpr <- df_long %>% 
@@ -496,6 +428,8 @@ df_fpr <- df_long %>%
     ymax = value + sd_value
   )
 
+df_fpr$feats <- factor(df_fpr$feats, levels = anomaly_names)
+df_tpr$feats <- factor(df_tpr$feats, levels = anomaly_names)
 
 # Create the TPR plot
 p_tpr <- ggplot(df_tpr, aes(x = anomaly_degree, y = value, color = site_scoring_method, group = site_scoring_method)) +
@@ -503,6 +437,7 @@ p_tpr <- ggplot(df_tpr, aes(x = anomaly_degree, y = value, color = site_scoring_
   geom_point(aes(shape = site_scoring_method)) +
   geom_errorbar(aes(ymin = ymin, ymax = ymax, color = site_scoring_method), alpha = 0.9) +
   scale_x_log10(breaks = c(0.01, 0.25, 0.5, 0.75, 1, 5, 10), labels = c("0", "0.25", "0.5", "0.75", "1", "5", "10")) +
+  scale_y_continuous(breaks = c(0, 0.25, 0.5, 0.75, 1)) +
   scale_color_manual(values = c("#1B9E77", "#D95F01", "#7570B3")) +
   facet_grid(parameter_id ~ feats, scales = "fixed") +
   labs(x = "Log-Scaled Anomaly Degree", y = "Average TPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method", shape = "Site Scoring Method", linetype = "Site Scoring Method") +
@@ -527,6 +462,7 @@ p_fpr <- ggplot(df_fpr, aes(x = anomaly_degree, y = value, color = site_scoring_
   geom_point(aes(shape = site_scoring_method)) +
   geom_errorbar(aes(ymin = ymin, ymax = ymax, color = site_scoring_method), alpha = 0.9) +
   scale_x_log10(breaks = c(0.01, 0.25, 0.5, 0.75, 1, 5, 10), labels = c("0", "0.25", "0.5", "0.75", "1", "5", "10")) +
+  scale_y_continuous(breaks = c(0, 0.05, 0.1, 0.15, 0.2, 0.25)) +
   scale_color_manual(values = c("#1B9E77", "#D95F01", "#7570B3")) +
   facet_grid(parameter_id ~ feats, scales = "fixed") +
   labs(x = "Log-Scaled Anomaly Degree", y = "Average TPR (+/- SD)", color = "Site Scoring Method", fill = "Site Scoring Method", shape = "Site Scoring Method", linetype = "Site Scoring Method") +
@@ -556,6 +492,19 @@ p_tpr / p_fpr / guide_area() + plot_layout(guides = "collect", axes = "collect",
 ```
 
 
+# Tables
+
+| Feature                                      | Anomaly Example                                                                                                                                                                                                                                               |
+|:----------------------------------------------|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Average value                                | Issues with device calibration for local labs where results are systematically lower or larger due to incorrect measurements.                                                                                                                                 |
+| Standard Deviation                           | Large fluctuations in liver enzymes which could be due to a safety reason.                                                                                                                                                                                    |
+| Range                                        | Time series with one large peak due to an incorrect original unit assignment.                                                                                                                                                                                 |
+| Unique Value Ratio                           | Copied Measurements.                                                                                                                                                                                                                                           |
+| Autocorrelation                              | Unexpected linear time series (autocorrelation close to 1) which can be due to the site adding a constant value to the previous measurement.                                                                                                                  |
+| Local Outlier Factor (LOF) @breunig_lof_2000 | LOF values greater than one indicate patterns very different from other subjects. In the other extreme, sites where all subjects have LOF values close to one might not have made all the measurements but entering plausible values within ranges of normal. |
+: Time Series Features {#tbl-features}
+
+
 
 
 
@@ -566,4 +515,4 @@ p_tpr / p_fpr / guide_area() + plot_layout(guides = "collect", axes = "collect",
 
 # Supporting Material
 
-The CTAS R package is available on github https://github.com/IMPALA-Consortium/ctas as version v0.3.0 . The code written for the validation is available in a separate repository https://github.com/IMPALA-Consortium/ctasval version v0.0.5 .
+The CTAS R package is available on github https://github.com/IMPALA-Consortium/ctas as version v0.3.0. The code written for the validation is available in a separate repository https://github.com/IMPALA-Consortium/ctasval version v0.0.5.
