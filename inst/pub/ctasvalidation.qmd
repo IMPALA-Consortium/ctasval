@@ -65,12 +65,12 @@ We find that CTAS can reliably detect site anomalies depending on the degree of 
 
 CTAS is a valuable tool for timely detection of outliers in clinical data, suitable for integration into risk-based strategies. Choosing the appropriate site anomaly scoring method is crucial for handling sites with fewer subjects effectively.
 
-# Keywords (required section)
+# Keywords
 
 RBQM, SDM, time series, anomaly, clinical trial, outlier
 
 
-# Introduction (required section)
+# Introduction
 
 Most clinical trial data consist of repeated measurements taken of the same patients over the duration of the trial. The integrity of these data points is mostly challenged by systemic errors introduced at site level which can have root causes such as: misinterpretation of the protocol, miscalibration of laboratory tests or devices, insufficient staff training and many more. These errors will affect a larger portion of patients enrolled at the site and should be statistically detectable as site-level anomalies given that sufficient compliant data has been collected within the current trial data set. Classical risk mitigation strategies consist of a combination of monitoring activities such as source data verification (SDV) and source data review (SDR), programmed data management edit checks and medical data review.
 
@@ -82,7 +82,7 @@ In this paper, we present an evaluation of Clinical Trial Anomaly Spotter (CTAS)
 
 Here we demonstrate the efficiency in detecting anomalous sites using simulations based on data from 15 clinical trials donated by three of the IMPALA member companies.
 
-# Methods (required section)
+# Methods
 
 ## Algorithm
 
