@@ -157,7 +157,7 @@ Subsequently we tried to detect the three anomalous sites using different site s
 
 # Results
 
-We tested three different scoring methods to detect six types of site anomalies introduced at varying degrees across 15 study data sets, donated by three different IMPALA members, with 4 measurement types (Alanine Aminotransferase, Creatinine, Systolic Blood Pressure, Weight). The resulting average True Positive Rate (TPR, also known as Recall) and False Positive Rate (FPR), along with their respective standard deviations, were plotted in @fig-results. The figure shows that TPR rates generally increase with higher anomaly rates, while the FPR either remains flat or slightly decreases as the degree of anomaly increases.
+We tested three different scoring methods to detect six types of site anomalies introduced at varying degrees across 15 study data sets, donated by three different IMPALA members, with 4 measurement types (Alanine Aminotransferase, Creatinine, Systolic Blood Pressure, Weight). The resulting average True Positive Rate (TPR, also known as Recall) and False Positive Rate (FPR), along with their respective standard deviations, were plotted in @fig-results-tpr and @fig-results-fpr. The figure shows that TPR rates generally increase with higher anomaly rates, while the FPR either remains flat or slightly decreases as the degree of anomaly increases.
 
 Overall, the mixed effects modeling method emerged as the most robust approach for detecting site-level anomalies, providing a good balance between high TPR and low FPR. The average feature value method, while effective in identifying true positives, was less reliable due to its high false positive rate. 
 
@@ -214,7 +214,7 @@ PT designed the CTAS algorithm, and wrote the R package. All authors participate
 
 @fig-timeseries-def Simplified example of time series definition. Blue cells denote subjects with a measurement at a given time point. Two time series have been defined. TS1 includes subjects (S1-S3) which have finished the study while the second time series (TS2) focuses on the first four time points and includes also subjects S4-S6 in addition to those in the TS1. Remaining subjects have data for too few time points to be considered in either of the time series.
 
-@fig-timeseries-feats Example of a time series with four time points and the features calculated from it. There is one feature which needs more explanation: site co-clustering - a measure of how similar the time series is to other subjects from the same site vs. subjects from all other sites. It is used to identify sites whose time series for a particular parameter are more similar to each other than could be expected by chance. In the extreme case, this could be indicative of sample splitting, i.e., a type of fraud where samples are collected from only one individual but assigned to several subjects. Figure 3 illustrates how co-clustering is calculated for a single time series.
+@fig-timeseries-feats Example of a time series with four time points and the features calculated from it. The context-free features can be calculated by using the data in the time series itself. In contrast, Local Outlier Factor (LOF) are context-dependent and its value depends on the time series of other subjects in the study.
 
 <!--
 < BK: not referenced in text
@@ -237,11 +237,15 @@ PT designed the CTAS algorithm, and wrote the R package. All authors participate
 
 @fig-anomalies Simulated site-level anomalies of of varying degree across different anomaly types based on a simulated test data set. Timelines from regular sites are shown in grey and timelines from an anomalous site in red. 
 
-@fig-results True positive and false positive ratio across different simulation scenarios. Ratios are represented as the mean with standard deviation obtained by 15 replicates obtained from simulations based on different studies. Timelines from two laboratory (Alanine Aminotransferase, Creatinine) and 2 vitals mesurements (Systolic Blood Pressure, Weight) were selected to be included in the simulation. The simulations randomly introduced 3 anomalous sites with increasing anomaly degrees into each iteration which needed to be detected by the CTAS algorithm. Study-level ratios were based on simulations with 100 iterations.
+@fig-results-tpr True positive rates (recall) across different simulation scenarios. Ratios are represented as the mean with standard deviation obtained by 15 replicates obtained from simulations based on different studies. Timelines from two laboratory (Alanine Aminotransferase, Creatinine) and 2 vitals mesurements (Systolic Blood Pressure, Weight) were selected to be included in the simulation. The simulations randomly introduced 3 anomalous sites with increasing anomaly degrees into each iteration which needed to be detected by the CTAS algorithm. Study-level ratios were based on simulations with 100 iterations.
 
+@fig-results-fpr False positive rates across different simulation scenarios. Ratios are represented as the mean with standard deviation obtained by 15 replicates obtained from simulations based on different studies. Timelines from two laboratory (Alanine Aminotransferase, Creatinine) and 2 vitals mesurements (Systolic Blood Pressure, Weight) were selected to be included in the simulation. The simulations randomly introduced 3 anomalous sites with increasing anomaly degrees into each iteration which needed to be detected by the CTAS algorithm. Study-level ratios were based on simulations with 100 iterations.
 
 
 # Figures
+
+![Evaluation Results, True Positive Rates](eval_results_tpr.png){#fig-results-tpr}
+![Evaluation Results, False Positive Rates](eval_results_fpr.png){#fig-results-fpr}
 
 ![Timeseries Definition](timeseries_def.png){#fig-timeseries-def}
 
