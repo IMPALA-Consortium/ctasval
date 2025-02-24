@@ -42,23 +42,12 @@ here::i_am("inst/pub/ctasvalidation.qmd")
 theme_ctas <- function() theme_bw(base_size = 9)
 ```
 
-# Author instructions (to be deleted)
 
-## Publishing Requirements TIRS
+# Enhancing Data Quality in Clinical Trials: Cross-company Validation of the Open-source Clinical Trial Anomaly Spotter (CTAS)
 
--   max 5000 words (Word count includes the abstract and full text, but not references, figures, or tables.)
--   structured abstract (Abstract should not exceed 250 words.)
--   https://media.springer.com/full/springer-instructions-for-authors-assets/pdf/1697415_TIRS%20Information%20for%20Authors.pdf
-
-for references add the doi link, I will add those to the `ctas.bib` file.
-
-# Title page
-
-> The running head for a manuscript will be the shortened manuscript title followed by an ellipsis.
 
 ## Abstract
 
-> structured abstract (Abstract should not exceed 250 words.), now 250 words
 
 ### Background
 
@@ -113,9 +102,6 @@ Eligable subjects must also not exceed the maximum ratio of missing values, whic
 Each time series is characterized by a set of time series features, which summarize all time series values into a single metric. These features are central to the algorithm as they are used to flag anomalous sites (see below). In addition, the features can be used to identify individual subjects with peculiar time series. Currently available time series features are listed in @tbl-features.
 
 All feature types except LOF are context-free meaning that only measurements in the time series are needed to calculate them. LOF on the other hand is context-dependent as its value depends also on the other time series in the study.
-
-It is important also to note that some features type correlate, e.g. Range and Standard Deviation. To limit duplication
-of signals, it is advisable to use only range or standard deviation.
 
 For an illustration of features for a time series, please see @fig-timeseries-feats.
 
@@ -202,7 +188,7 @@ We have picked four different measurement types (Alanine Aminotransferase, Creat
 
 The most complex anomalies introduced were autocorrelation and LOF their corresponding TPR rates were comparatively low when compared to the other anomalies. Even though extreme values were introduced we could not detect the corresponding elevated time series feature values among the signal of the unaltered time series. This shows a high level of noise that is present in the test data sets in regard to those time series features.
 
-In practice extreme values in the data set will not only chance one but many time series features. Thus there is a good change that anomalies in the data will create multiple signals that complement each other. CTAS does not try to preemptively select the most appropriate statistical test for a given measurement type and time series length. Therefore all timeseries features should always be measured across all timeseries to cast a wide net for detecting anomalies. 
+In practice extreme values in the data set will not only change one but many time series features. Thus there is a good change that anomalies in the data will create multiple signals that complement each other. CTAS does not try to preemptively select the most appropriate statistical test for a given measurement type and time series length. Therefore all timeseries features can always be measured across all timeseries to cast a wide net for detecting anomalies. 
 
 CTAS does not offer built-in native support for categorical, ordinal and date type data they can be transformed to a numerical data type before running CTAS. This is expected to provide similar results as specifically adapted tests for these data types although this remains to be tested but would require a different strategy for introducing anomalies which would exceed the scope of this work.
 
