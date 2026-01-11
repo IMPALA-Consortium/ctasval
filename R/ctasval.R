@@ -129,6 +129,7 @@ prep_sdtm_vs <- function(vs, dm, scramble = TRUE) {
 #' @param default_max_share_missing_timepoints_per_series Maximum share of missing timepoints per series. Default is 0.5.
 #' @param default_generate_change_from_baseline Logical indicating whether to generate change from baseline. Default is FALSE.
 #' @param autogenerate_timeseries Logical indicating whether to auto-generate timeseries. Default is TRUE.
+#' @param padjust_method parameter passed to [p.adjust()] method parameter, Default: "BY"
 #' @return A data frame with the CTAS results.
 #' @keywords internal
 #' @seealso \code{\link{get_anomaly_scores}}
@@ -138,7 +139,8 @@ get_ctas <- function(df, feats,
                      default_max_share_missing_timepoints_per_series = 0.5,
                      default_generate_change_from_baseline = FALSE,
                      autogenerate_timeseries = TRUE,
-                     site_scoring_method) {
+                     site_scoring_method,
+                     padjust_method = "BY") {
 
   parameters <- df %>%
     distinct(
@@ -187,7 +189,8 @@ get_ctas <- function(df, feats,
     default_max_share_missing_timepoints_per_series = default_max_share_missing_timepoints_per_series,
     default_generate_change_from_baseline = default_generate_change_from_baseline,
     autogenerate_timeseries = autogenerate_timeseries,
-    site_scoring_method = site_scoring_method
+    site_scoring_method = site_scoring_method,
+    padjust_method = padjust_method
   )
 
   if(site_scoring_method == "ks") {
@@ -344,6 +347,7 @@ get_anomaly_data <- function(df, n_sites, fun_anomaly, anomaly_degree, site_pref
 #' @param default_generate_change_from_baseline Logical indicating whether to generate change from baseline. Default is FALSE.
 #' @param autogenerate_timeseries Logical indicating whether to auto-generate timeseries. Default is TRUE.
 #' @param site_scoring_method How to score sites ("ks" = Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling, "avg_feat_value" = Average site feature value.
+#' @param padjust_method parameter passed to [p.adjust()] method parameter, Default: "BY"
 #' @return A data frame with the anomaly scores.
 #' @keywords internal
 #' @seealso \code{\link{ctasval}}
@@ -353,7 +357,9 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
                                default_max_share_missing_timepoints_per_series = 0.5,
                                default_generate_change_from_baseline = FALSE,
                                autogenerate_timeseries = TRUE,
-                               site_scoring_method) {
+                               site_scoring_method,
+                               padjust_method = "BY"
+                               ) {
 
   df_anomaly <- get_anomaly_data(
     df = df,
@@ -371,7 +377,8 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
     default_max_share_missing_timepoints_per_series = default_max_share_missing_timepoints_per_series,
     default_generate_change_from_baseline = default_generate_change_from_baseline,
     autogenerate_timeseries = autogenerate_timeseries,
-    site_scoring_method = site_scoring_method
+    site_scoring_method = site_scoring_method,
+    padjust_method = padjust_method
   ) %>%
     mutate(
       is_P = startsWith(.data$site, "sample_site")
@@ -463,6 +470,7 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
 #' @param site_scoring_method site_scoring_method How to score sites ("ks" =
 #'   Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling,
 #'   "avg_feat_value" = Average site feature value. Default:ks
+#' @param padjust_method parameter passed to [p.adjust()] method parameter, Default: "BY"
 #' @return A list containing the performance metrics and anomaly data.
 #' @export
 #' @examples
@@ -495,7 +503,8 @@ ctasval <- function(df,
                     default_max_share_missing_timepoints_per_series = 0.5,
                     default_generate_change_from_baseline = FALSE,
                     autogenerate_timeseries = TRUE,
-                    site_scoring_method = "ks") {
+                    site_scoring_method = "ks",
+                    padjust_method = "BY") {
 
   stopifnot("Each 'fun_anomaly' must be paired with one 'feats'" = length(fun_anomaly) == length(feats))
 
@@ -532,7 +541,8 @@ ctasval <- function(df,
             default_max_share_missing_timepoints_per_series = default_max_share_missing_timepoints_per_series,
             default_generate_change_from_baseline = default_generate_change_from_baseline,
             autogenerate_timeseries = autogenerate_timeseries,
-            site_scoring_method = site_scoring_method
+            site_scoring_method = site_scoring_method,
+            padjust_method = padjust_method
           ),
           .purrr_args = purrr_args,
           .steps = nrow(df_grid),

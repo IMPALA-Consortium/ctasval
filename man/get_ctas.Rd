@@ -12,7 +12,8 @@ get_ctas(
   default_max_share_missing_timepoints_per_series = 0.5,
   default_generate_change_from_baseline = FALSE,
   autogenerate_timeseries = TRUE,
-  site_scoring_method
+  site_scoring_method,
+  padjust_method = "BY"
 )
 }
 \arguments{
@@ -29,6 +30,8 @@ get_ctas(
 \item{default_generate_change_from_baseline}{Logical indicating whether to generate change from baseline. Default is FALSE.}
 
 \item{autogenerate_timeseries}{Logical indicating whether to auto-generate timeseries. Default is TRUE.}
+
+\item{padjust_method}{parameter passed to \code{\link[=p.adjust]{p.adjust()}} method parameter, Default: "BY"}
 }
 \value{
 A data frame with the CTAS results.

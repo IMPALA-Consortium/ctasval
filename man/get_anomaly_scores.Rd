@@ -16,7 +16,8 @@ get_anomaly_scores(
   default_max_share_missing_timepoints_per_series = 0.5,
   default_generate_change_from_baseline = FALSE,
   autogenerate_timeseries = TRUE,
-  site_scoring_method
+  site_scoring_method,
+  padjust_method = "BY"
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ get_anomaly_scores(
 \item{autogenerate_timeseries}{Logical indicating whether to auto-generate timeseries. Default is TRUE.}
 
 \item{site_scoring_method}{How to score sites ("ks" = Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling, "avg_feat_value" = Average site feature value.}
+
+\item{padjust_method}{parameter passed to \code{\link[=p.adjust]{p.adjust()}} method parameter, Default: "BY"}
 }
 \value{
 A data frame with the anomaly scores.
