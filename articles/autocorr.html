@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">ctasval</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -110,10 +110,10 @@ value to the current value</li>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="fu">plot_anomaly</span><span class="op">(</span><span class="va">df_filt</span>, <span class="va">anomaly_autocorr</span>, anomaly_degree <span class="op">=</span> <span class="fl">0.7</span>, seed <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="autocorr_files/figure-html/unnamed-chunk-2-1.png" width="700"></p>
+<p><img src="autocorr_files/figure-html/unnamed-chunk-2-1.png" class="r-plt" alt="" width="700"></p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">plot_anomaly</span><span class="op">(</span><span class="va">df_filt</span>, <span class="va">anomaly_autocorr2</span>, anomaly_degree <span class="op">=</span> <span class="fl">0.7</span>, seed <span class="op">=</span> <span class="fl">3</span><span class="op">)</span></span></code></pre></div>
-<p><img src="autocorr_files/figure-html/unnamed-chunk-2-2.png" width="700"></p>
+<p><img src="autocorr_files/figure-html/unnamed-chunk-2-2.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level2">
 <h2 id="compare-autocorrelation-values">Compare Autocorrelation Values<a class="anchor" aria-label="anchor" href="#compare-autocorrelation-values"></a>
@@ -160,7 +160,7 @@ value to the current value</li>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/factor.html" class="external-link">as.factor</a></span><span class="op">(</span><span class="va">anomaly_degree</span><span class="op">)</span>, <span class="va">autocorr</span>, fill <span class="op">=</span> <span class="va">fun_name</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_boxplot.html" class="external-link">geom_boxplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"bottom"</span><span class="op">)</span></span></code></pre></div>
-<p><img src="autocorr_files/figure-html/unnamed-chunk-5-1.png" width="672"></p>
+<p><img src="autocorr_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="" width="672"></p>
 </div>
 <div class="section level2">
 <h2 id="autocorrelation-of-a-sinus-function">Autocorrelation of a Sinus Function<a class="anchor" aria-label="anchor" href="#autocorrelation-of-a-sinus-function"></a>
@@ -170,7 +170,7 @@ value to the current value</li>
 </h3>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/stats/acf.html" class="external-link">acf</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/Trig.html" class="external-link">sin</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="fl">10</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-<p><img src="autocorr_files/figure-html/unnamed-chunk-6-1.png" width="700"></p>
+<p><img src="autocorr_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="autocorrelation-of-a-random-patient-for-alkaline-phosphatase-measurements-considering-lag-1-to-9">Autocorrelation of a random patient for Alkaline Phosphatase
@@ -181,7 +181,7 @@ measurements considering lag 1 to 9<a class="anchor" aria-label="anchor" href="#
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">dense_rank</a></span><span class="op">(</span><span class="va">subject_id</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="va">acf</span></span></code></pre></div>
-<p><img src="autocorr_files/figure-html/unnamed-chunk-7-1.png" width="700"></p>
+<p><img src="autocorr_files/figure-html/unnamed-chunk-7-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 <div class="section level3">
 <h3 id="autocorrelation-of-a-random-patient-for-alkaline-phosphatase-measurements-considering-lag-1-to-9-1">Autocorrelation of a random patient for Alkaline Phosphatase
@@ -193,7 +193,7 @@ measurements considering lag 1 to 9<a class="anchor" aria-label="anchor" href="#
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/row_number.html" class="external-link">dense_rank</a></span><span class="op">(</span><span class="va">subject_id</span><span class="op">)</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/pull.html" class="external-link">pull</a></span><span class="op">(</span><span class="va">result</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="va">acf</span></span></code></pre></div>
-<p><img src="autocorr_files/figure-html/unnamed-chunk-8-1.png" width="700"></p>
+<p><img src="autocorr_files/figure-html/unnamed-chunk-8-1.png" class="r-plt" alt="" width="700"></p>
 </div>
 </div>
 <div class="section level2">
@@ -217,7 +217,7 @@ autocorrelation above ~ 0.6</p>
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer>

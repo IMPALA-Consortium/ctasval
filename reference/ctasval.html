@@ -9,7 +9,7 @@ scores, and summarizing performance metrics."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ctasval</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,8 @@ scores, and summarizing performance metrics.</p>
 <span>  default_max_share_missing_timepoints_per_series <span class="op">=</span> <span class="fl">0.5</span>,</span>
 <span>  default_generate_change_from_baseline <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  autogenerate_timeseries <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  site_scoring_method <span class="op">=</span> <span class="st">"ks"</span></span>
+<span>  site_scoring_method <span class="op">=</span> <span class="st">"ks"</span>,</span>
+<span>  padjust_method <span class="op">=</span> <span class="st">"BY"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -132,6 +133,10 @@ timeseries. Default is TRUE.</p></dd>
 <dd><p>site_scoring_method How to score sites ("ks" =
 Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling,
 "avg_feat_value" = Average site feature value. Default:ks</p></dd>
+
+
+<dt id="arg-padjust-method">padjust_method<a class="anchor" aria-label="anchor" href="#arg-padjust-method"></a></dt>
+<dd><p>parameter passed to <code><a href="https://rdrr.io/r/stats/p.adjust.html" class="external-link">p.adjust()</a></code> method parameter, Default: "BY"</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -208,7 +213,7 @@ Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling,
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.1.1.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
 </div>
 
     </footer></div>
