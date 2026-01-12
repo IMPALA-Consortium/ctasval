@@ -9,3 +9,6 @@ inst/pub/*.html
 inst/pub/*.docx
 /pub/
 inst/doc
+
+# README Parquet files
+ctas_*.parquet

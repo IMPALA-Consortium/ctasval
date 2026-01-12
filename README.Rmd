@@ -47,6 +47,7 @@ library(future)
 library(ctasval)
 library(ggplot2)
 library(tidyr)
+library(arrow)
 
 
 
@@ -63,6 +64,11 @@ df_filt <- df_prep %>%
   filter(parameter_id %in% c("Pulse Rate", "Alanine Aminotransferase")) %>%
   filter(! grepl("UNSCH", timepoint_1_name) & !timepoint_1_name %in% c("AMBUL ECG REMOVAL", "RETRIEVAL"))
 
+```
+
+**Note:** On some systems, running multiple ctasval chunks with multiprocessing in the same R session may cause hangs or memory issues. If you experience this, restart your R session between running different ctasval chunks.
+
+```{r eval=FALSE}
 plan(multisession, workers = 6)
 
 ctas <- ctasval(
@@ -84,15 +90,19 @@ ctas <- ctasval(
   site_scoring_method = "ks"
 )
 
-plan(sequential)
+arrow::write_parquet(ctas$result, "ctas_ks_result.parquet")
 
-ctas
+ctas$anomaly %>%
+  select(- fun_anomaly) %>%
+  arrow::write_parquet("ctas_ks_anomaly.parquet")
 ```
 
 ### Performance Metrics
 
 ```{r}
-ctas$result %>%
+ctas_result <- arrow::read_parquet("ctas_ks_result.parquet")
+
+ctas_result %>%
   tidyr::pivot_longer(c(tpr, fpr), values_to = "metric", names_to = "metric_type") %>%
   ggplot(aes(log(anomaly_degree),  metric)) +
   geom_line(aes(linetype = metric_type)) +
@@ -104,7 +114,7 @@ ctas$result %>%
 
 ### Mixed Effect Scoring
 
-```{r}
+```{r eval = FALSE}
 plan(multisession, workers = 6)
 
 ctas <- ctasval(
@@ -112,7 +122,7 @@ ctas <- ctasval(
   fun_anomaly = c(
     anomaly_average,
     anomaly_sd,
-    anomaly_autocorr,
+    anomaly_autocorr2,
     anomaly_lof,
     anomaly_range,
     anomaly_unique_value_count_relative
@@ -126,9 +136,18 @@ ctas <- ctasval(
   site_scoring_method = "mixedeffects"
 )
 
-plan(sequential)
+arrow::write_parquet(ctas$result, "ctas_mixedeffects_result.parquet")
 
-ctas$result %>%
+ctas$anomaly %>%
+  select(- fun_anomaly) %>%
+  arrow::write_parquet("ctas_mixedeffects_anomaly.parquet")
+
+```
+
+```{r}
+ctas_result <- arrow::read_parquet("ctas_mixedeffects_result.parquet")
+
+ctas_result %>%
   tidyr::pivot_longer(c(tpr, fpr), values_to = "metric", names_to = "metric_type") %>%
   ggplot(aes(log(anomaly_degree),  metric)) +
   geom_line(aes(linetype = metric_type)) +
@@ -140,7 +159,7 @@ ctas$result %>%
 
 ### Average Box Plot Scoring
 
-```{r}
+```{r eval=FALSE}
 plan(multisession, workers = 6)
 
 ctas <- ctasval(
@@ -148,7 +167,7 @@ ctas <- ctasval(
   fun_anomaly = c(
     anomaly_average,
     anomaly_sd,
-    anomaly_autocorr,
+    anomaly_autocorr2,
     anomaly_lof,
     anomaly_range,
     anomaly_unique_value_count_relative
@@ -161,9 +180,18 @@ ctas <- ctasval(
   site_scoring_method = "avg_feat_value"
 )
 
-plan(sequential)
+arrow::write_parquet(ctas$result, "ctas_avgfeat_result.parquet")
 
-ctas$result %>%
+ctas$anomaly %>%
+  select(- fun_anomaly) %>%
+  arrow::write_parquet("ctas_avgfeat_anomaly.parquet")
+
+```
+
+```{r}
+ctas_result <- arrow::read_parquet("ctas_avgfeat_result.parquet")
+
+ctas_result %>%
   tidyr::pivot_longer(c(tpr, fpr), values_to = "metric", names_to = "metric_type") %>%
   ggplot(aes(log(anomaly_degree),  metric)) +
   geom_line(aes(linetype = metric_type)) +
@@ -179,7 +207,9 @@ ctas$result %>%
 Anomalous Sites and their scores can be reviewed.
 
 ```{r}
-ctas$anomaly %>%
+ctas_anomaly <- arrow::read_parquet("ctas_avgfeat_anomaly.parquet")
+
+ctas_anomaly %>%
   select(
     iter,
     anomaly_degree,
@@ -197,6 +227,10 @@ ctas$anomaly %>%
 
 ```
 
+```{r}
+plan(sequential)
+```
+
 
 ## Publication
 
@@ -207,5 +241,8 @@ to edit publication edit `inst/pub/ctasvalidation.qmd`
 ```{r eval=FALSE}
 quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "html")
 quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "docx")
+quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "pdf")
+quarto::quarto_render("inst/pub/ctasvalidation.qmd", output_format = "latex")
+
 ```
 

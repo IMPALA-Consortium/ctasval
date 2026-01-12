@@ -1,6 +1,6 @@
 Package: ctasval
 Title: Validate ctas
-Version: 0.0.5
+Version: 0.0.6
 Authors@R: c(
   person("Björn", "Koneswarakantha",
     role = c("aut", "cre"),
@@ -27,7 +27,7 @@ Imports:
   furrr,
   tidyr,
   simaerep,
-  ctas,
+  ctas (>= 0.4.0),
   rlang
 Suggests:
     pharmaversesdtm,
@@ -35,6 +35,7 @@ Suggests:
     ggplot2,
     pkgdown,
     knitr,
-    rmarkdown
+    rmarkdown,
+    arrow
 Config/testthat/edition: 3
 VignetteBuilder: knitr

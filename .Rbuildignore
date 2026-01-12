@@ -12,3 +12,5 @@
 ^.quarto$
 ^.+\.csv$
 ^[^/]+\.html$
+^inst/eda$
+^ctas_.*\.parquet$
