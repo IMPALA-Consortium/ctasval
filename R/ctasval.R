@@ -432,10 +432,17 @@ get_anomaly_scores <- function(df, n_sites, fun_anomaly, anomaly_degree, feats, 
       by = c("site", "parameter_id")
     )
 
+  df_scores <- df_ctas %>%
+    summarize(
+      max_score = max(.data$score, na.rm = TRUE),
+      .by = c("site", "parameter_id")
+    )
+
   structure(
     list(
       result = df_result,
-      anomaly = df_anomaly_filt
+      anomaly = df_anomaly_filt,
+      scores = df_scores
     ),
     class = "ctasval_single"
   )
@@ -569,12 +576,19 @@ ctasval <- function(df,
 
   df_anomaly <- df_result %>%
     mutate(ctas = map(.data$ctas, "anomaly")) %>%
-    unnest("ctas")
+    unnest("ctas") %>%
+    select(- "fun_anomaly")
+
+  df_scores <- df_result %>%
+    mutate(ctas = map(.data$ctas, "scores")) %>%
+    unnest("ctas") %>%
+    select(- "fun_anomaly")
 
   structure(
     list(
       result = df_perf,
-      anomaly = df_anomaly
+      anomaly = df_anomaly,
+      scores = df_scores
     ),
     class = "ctasval_aggregated"
   )
