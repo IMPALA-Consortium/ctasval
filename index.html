@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">ctasval</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -67,14 +67,22 @@
 </h2>
 <p><code>ctasval</code> adds three anomalous sites to the data set for each iteration and tries to detect them using {ctas}. It samples from the study site pool to first determine the number of patients and then samples a sufficient number of patients from the study patient pool.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pharmaverse.github.io/pharmaversesdtm/" class="external-link">pharmaversesdtm</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://pharmaverse.github.io/pharmaversesdtm/" class="external-link">pharmaversesdtm</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://future.futureverse.org" class="external-link">future</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'future' was built under R version 4.4.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://impala-consortium.github.io/ctasval">ctasval</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ggplot2.tidyverse.org" class="external-link">ggplot2</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; Warning: package 'ggplot2' was built under R version 4.4.3</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyr.tidyverse.org" class="external-link">tidyr</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/apache/arrow/" class="external-link">arrow</a></span><span class="op">)</span></span>
 <span></span>
 <span></span>
 <span></span>
@@ -116,13 +124,16 @@
 <span><span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="va">ctas</span><span class="op">$</span><span class="va">result</span>, <span class="st">"ctas_ks_result.parquet"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas</span><span class="op">$</span><span class="va">anomaly</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span> <span class="va">fun_anomaly</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_ks_anomaly.parquet"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_ks_anomaly.parquet"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ctas</span><span class="op">$</span><span class="va">scores</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_ks_scores.parquet"</span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
 <h3 id="performance-metrics">Performance Metrics<a class="anchor" aria-label="anchor" href="#performance-metrics"></a>
 </h3>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ctas_result</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_ks_result.parquet"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="va">ctas_result</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_ks_result.parquet"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tpr</span>, <span class="va">fpr</span><span class="op">)</span>, values_to <span class="op">=</span> <span class="st">"metric"</span>, names_to <span class="op">=</span> <span class="st">"metric_type"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -161,10 +172,13 @@
 <span><span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="va">ctas</span><span class="op">$</span><span class="va">result</span>, <span class="st">"ctas_mixedeffects_result.parquet"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas</span><span class="op">$</span><span class="va">anomaly</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span> <span class="va">fun_anomaly</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_mixedeffects_anomaly.parquet"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_mixedeffects_anomaly.parquet"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ctas</span><span class="op">$</span><span class="va">scores</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_mixedeffects_scores.parquet"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ctas_result</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_mixedeffects_result.parquet"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="va">ctas_result</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_mixedeffects_result.parquet"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tpr</span>, <span class="va">fpr</span><span class="op">)</span>, values_to <span class="op">=</span> <span class="st">"metric"</span>, names_to <span class="op">=</span> <span class="st">"metric_type"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -202,10 +216,13 @@
 <span><span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="va">ctas</span><span class="op">$</span><span class="va">result</span>, <span class="st">"ctas_avgfeat_result.parquet"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas</span><span class="op">$</span><span class="va">anomaly</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span> <span class="va">fun_anomaly</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_avgfeat_anomaly.parquet"</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_avgfeat_anomaly.parquet"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ctas</span><span class="op">$</span><span class="va">scores</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/write_parquet.html" class="external-link">write_parquet</a></span><span class="op">(</span><span class="st">"ctas_avgfeat_scores.parquet"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ctas_result</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_avgfeat_result.parquet"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="va">ctas_result</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_avgfeat_result.parquet"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas_result</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/pivot_longer.html" class="external-link">pivot_longer</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">tpr</span>, <span class="va">fpr</span><span class="op">)</span>, values_to <span class="op">=</span> <span class="st">"metric"</span>, names_to <span class="op">=</span> <span class="st">"metric_type"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
@@ -221,7 +238,8 @@
 </h3>
 <p>Anomalous Sites and their scores can be reviewed.</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">ctas_anomaly</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_avgfeat_anomaly.parquet"</span><span class="op">)</span></span>
+<code class="sourceCode R"><span></span>
+<span><span class="va">ctas_anomaly</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_avgfeat_anomaly.parquet"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">ctas_anomaly</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span></span>
@@ -236,19 +254,19 @@
 <span>    <span class="va">score</span></span>
 <span>  <span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">iter</span>, <span class="fu"><a href="https://dplyr.tidyverse.org/reference/desc.html" class="external-link">desc</a></span><span class="op">(</span><span class="va">anomaly_degree</span><span class="op">)</span>, <span class="va">parameter_id</span>, <span class="va">feats</span>, <span class="va">site</span>, <span class="va">subject_id</span>, <span class="va">timepoint_rank</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">50</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">25</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="4%">
 <col width="11%">
-<col width="7%">
-<col width="19%">
-<col width="10%">
-<col width="19%">
 <col width="11%">
-<col width="9%">
-<col width="5%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
 </colgroup>
 <thead><tr class="header">
 <th align="right">iter</th>
@@ -537,285 +555,240 @@
 <td align="right">2610</td>
 <td align="right">1</td>
 </tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="scores">Scores<a class="anchor" aria-label="anchor" href="#scores"></a>
+</h3>
+<p>Maximum scores obtained for each site in each iteration from all autogenerated time series can be reviewed.</p>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
+<span><span class="va">ctas_scores</span> <span class="op">&lt;-</span> <span class="fu">arrow</span><span class="fu">::</span><span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"ctas_avgfeat_scores.parquet"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">ctas_scores</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">25</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<table class="table">
+<colgroup>
+<col width="8%">
+<col width="21%">
+<col width="12%">
+<col width="8%">
+<col width="35%">
+<col width="14%">
+</colgroup>
+<thead><tr class="header">
+<th align="right">iter</th>
+<th align="right">anomaly_degree</th>
+<th align="left">feats</th>
+<th align="left">site</th>
+<th align="left">parameter_id</th>
+<th align="right">max_score</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">709</td>
+<td align="left">Alanine Aminotransferase</td>
+<td align="right">0</td>
+</tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">708</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-717-1004</td>
-<td align="right">7</td>
-<td align="right">26126</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">718</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-717-1004</td>
-<td align="right">8</td>
-<td align="right">261277</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">716</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-717-1004</td>
-<td align="right">9</td>
-<td align="right">2612791</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">710</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-717-1004</td>
-<td align="right">10</td>
-<td align="right">26127931</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">704</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-717-1004</td>
-<td align="right">11</td>
-<td align="right">261279329</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">701</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-717-1004</td>
-<td align="right">12</td>
-<td align="right">2612793310</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">705</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site1</td>
-<td align="left">sample_site1-01-717-1004</td>
-<td align="right">13</td>
-<td align="right">26127933116</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">717</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1023</td>
-<td align="right">1</td>
-<td align="right">23</td>
 <td align="right">1</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">703</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1023</td>
-<td align="right">4</td>
-<td align="right">260</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">707</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1023</td>
-<td align="right">5</td>
-<td align="right">2638</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">715</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1033</td>
-<td align="right">1</td>
-<td align="right">16</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">711</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1033</td>
-<td align="right">4</td>
-<td align="right">195</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">713</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1033</td>
-<td align="right">5</td>
-<td align="right">1964</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">706</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">1</td>
-<td align="right">15</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">714</td>
 <td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">4</td>
-<td align="right">169</td>
-<td align="right">1</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">5</td>
-<td align="right">1711</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">709</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">7</td>
-<td align="right">17125</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">708</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">8</td>
-<td align="right">171274</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">718</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">9</td>
-<td align="right">1712760</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">716</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">10</td>
-<td align="right">17127621</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">710</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">11</td>
-<td align="right">171276233</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">704</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">12</td>
-<td align="right">1712762345</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">701</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-701-1034</td>
-<td align="right">13</td>
-<td align="right">17127623468</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">705</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
 <td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-704-1010</td>
-<td align="right">1</td>
-<td align="right">9</td>
-<td align="right">1</td>
-</tr>
-<tr class="even">
-<td align="right">1</td>
-<td align="right">10</td>
-<td align="left">autocorr</td>
-<td align="left">Alanine Aminotransferase</td>
-<td align="left">sample_site2</td>
-<td align="left">sample_site2-01-704-1010</td>
-<td align="right">4</td>
-<td align="right">96</td>
-<td align="right">1</td>
+<td align="right">0</td>
+<td align="left">average</td>
+<td align="left">717</td>
+<td align="left">Pulse Rate</td>
+<td align="right">0</td>
 </tr>
 </tbody>
 </table>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://future.futureverse.org/reference/plan.html" class="external-link">plan</a></span><span class="op">(</span><span class="va">sequential</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">

@@ -117,6 +117,18 @@ ctas <- ctasval(
   parallel = FALSE,
   iter = 1
 )
+#> Warning: There were 12 warnings in `mutate()`.
+#> The first warning was:
+#> ℹ In argument: `max_score = max(.data$score, na.rm = TRUE)`.
+#> Caused by warning:
+#> ! There were 6 warnings in `summarize()`.
+#> The first warning was:
+#> ℹ In argument: `max_score = max(.data$score, na.rm = TRUE)`.
+#> ℹ In group 6: `site = "714"` `parameter_id = "Alkaline Phosphatase"`.
+#> Caused by warning in `max()`:
+#> ! no non-missing arguments to max; returning -Inf
+#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 5 remaining warnings.
+#> ℹ Run `dplyr::last_dplyr_warnings()` to see the 11 remaining warnings.
 
 ctas
 #> $result
@@ -137,26 +149,42 @@ ctas
 #> 12           50   sd      Alkaline Phosphat…    17     2     0     1 0.333     0
 #> 
 #> $anomaly
-#> # A tibble: 3,358 × 39
-#>     iter anomaly_degree fun_anomaly feats   STUDYID      DOMAIN subject_id LBSEQ
-#>    <int>          <dbl> <list>      <chr>   <chr>        <chr>  <chr>      <dbl>
-#>  1     1              0 <fn>        average CDISCPILOT01 LB     sample_si…     2
-#>  2     1              0 <fn>        average CDISCPILOT01 LB     sample_si…    39
-#>  3     1              0 <fn>        average CDISCPILOT01 LB     sample_si…    74
-#>  4     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   104
-#>  5     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   134
-#>  6     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   164
-#>  7     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   199
-#>  8     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   229
-#>  9     1              0 <fn>        average CDISCPILOT01 LB     sample_si…   259
-#> 10     1              0 <fn>        average CDISCPILOT01 LB     sample_si…     2
+#> # A tibble: 3,358 × 38
+#>     iter anomaly_degree feats   STUDYID  DOMAIN subject_id LBSEQ LBTESTCD LBTEST
+#>    <int>          <dbl> <chr>   <chr>    <chr>  <chr>      <dbl> <chr>    <chr> 
+#>  1     1              0 average CDISCPI… LB     sample_si…     2 ALP      Alkal…
+#>  2     1              0 average CDISCPI… LB     sample_si…    39 ALP      Alkal…
+#>  3     1              0 average CDISCPI… LB     sample_si…    74 ALP      Alkal…
+#>  4     1              0 average CDISCPI… LB     sample_si…   104 ALP      Alkal…
+#>  5     1              0 average CDISCPI… LB     sample_si…   134 ALP      Alkal…
+#>  6     1              0 average CDISCPI… LB     sample_si…   164 ALP      Alkal…
+#>  7     1              0 average CDISCPI… LB     sample_si…   199 ALP      Alkal…
+#>  8     1              0 average CDISCPI… LB     sample_si…   229 ALP      Alkal…
+#>  9     1              0 average CDISCPI… LB     sample_si…   259 ALP      Alkal…
+#> 10     1              0 average CDISCPI… LB     sample_si…     2 ALP      Alkal…
 #> # ℹ 3,348 more rows
-#> # ℹ 31 more variables: LBTESTCD <chr>, LBTEST <chr>, LBCAT <chr>,
-#> #   LBORRES <chr>, LBORRESU <chr>, LBORNRLO <chr>, LBORNRHI <chr>,
-#> #   LBSTRESC <chr>, LBSTRESN <dbl>, LBSTRESU <chr>, LBSTNRLO <dbl>,
-#> #   LBSTNRHI <dbl>, LBNRIND <chr>, LBBLFL <chr>, VISITNUM <dbl>, VISIT <chr>,
-#> #   VISITDY <dbl>, LBDTC <chr>, LBDY <dbl>, timepoint_rank <dbl>,
-#> #   timepoint_1_name <chr>, result <dbl>, parameter_id <chr>, …
+#> # ℹ 29 more variables: LBCAT <chr>, LBORRES <chr>, LBORRESU <chr>,
+#> #   LBORNRLO <chr>, LBORNRHI <chr>, LBSTRESC <chr>, LBSTRESN <dbl>,
+#> #   LBSTRESU <chr>, LBSTNRLO <dbl>, LBSTNRHI <dbl>, LBNRIND <chr>,
+#> #   LBBLFL <chr>, VISITNUM <dbl>, VISIT <chr>, VISITDY <dbl>, LBDTC <chr>,
+#> #   LBDY <dbl>, timepoint_rank <dbl>, timepoint_1_name <chr>, result <dbl>,
+#> #   parameter_id <chr>, parameter_name <chr>, timepoint_2_name <chr>, …
+#> 
+#> $scores
+#> # A tibble: 240 × 6
+#>     iter anomaly_degree feats   site  parameter_id         max_score
+#>    <int>          <dbl> <chr>   <chr> <chr>                    <dbl>
+#>  1     1              0 average 718   Alkaline Phosphatase         0
+#>  2     1              0 average 703   Alkaline Phosphatase         0
+#>  3     1              0 average 701   Alkaline Phosphatase         0
+#>  4     1              0 average 708   Alkaline Phosphatase         0
+#>  5     1              0 average 716   Alkaline Phosphatase         0
+#>  6     1              0 average 714   Alkaline Phosphatase      -Inf
+#>  7     1              0 average 710   Alkaline Phosphatase         0
+#>  8     1              0 average 704   Alkaline Phosphatase      -Inf
+#>  9     1              0 average 713   Alkaline Phosphatase      -Inf
+#> 10     1              0 average 711   Alkaline Phosphatase         0
+#> # ℹ 230 more rows
 #> 
 #> attr(,"class")
 #> [1] "ctasval_aggregated"

@@ -22,14 +22,22 @@ pool to first determine the number of patients and then samples a
 sufficient number of patients from the study patient pool.
 
 ``` r
-
 library(pharmaversesdtm)
 library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 library(future)
+#> Warning: package 'future' was built under R version 4.4.3
 library(ctasval)
 library(ggplot2)
+#> Warning: package 'ggplot2' was built under R version 4.4.3
 library(tidyr)
-library(arrow)
 
 
 
@@ -77,13 +85,16 @@ ctas <- ctasval(
 arrow::write_parquet(ctas$result, "ctas_ks_result.parquet")
 
 ctas$anomaly %>%
-  select(- fun_anomaly) %>%
   arrow::write_parquet("ctas_ks_anomaly.parquet")
+
+ctas$scores %>%
+  arrow::write_parquet("ctas_ks_scores.parquet")
 ```
 
 ### Performance Metrics
 
 ``` r
+
 ctas_result <- arrow::read_parquet("ctas_ks_result.parquet")
 
 ctas_result %>%
@@ -124,11 +135,14 @@ ctas <- ctasval(
 arrow::write_parquet(ctas$result, "ctas_mixedeffects_result.parquet")
 
 ctas$anomaly %>%
-  select(- fun_anomaly) %>%
   arrow::write_parquet("ctas_mixedeffects_anomaly.parquet")
+
+ctas$scores %>%
+  arrow::write_parquet("ctas_mixedeffects_scores.parquet")
 ```
 
 ``` r
+
 ctas_result <- arrow::read_parquet("ctas_mixedeffects_result.parquet")
 
 ctas_result %>%
@@ -168,11 +182,14 @@ ctas <- ctasval(
 arrow::write_parquet(ctas$result, "ctas_avgfeat_result.parquet")
 
 ctas$anomaly %>%
-  select(- fun_anomaly) %>%
   arrow::write_parquet("ctas_avgfeat_anomaly.parquet")
+
+ctas$scores %>%
+  arrow::write_parquet("ctas_avgfeat_scores.parquet")
 ```
 
 ``` r
+
 ctas_result <- arrow::read_parquet("ctas_avgfeat_result.parquet")
 
 ctas_result %>%
@@ -191,6 +208,7 @@ ctas_result %>%
 Anomalous Sites and their scores can be reviewed.
 
 ``` r
+
 ctas_anomaly <- arrow::read_parquet("ctas_avgfeat_anomaly.parquet")
 
 ctas_anomaly %>%
@@ -206,7 +224,7 @@ ctas_anomaly %>%
     score
   ) %>%
   arrange(iter, desc(anomaly_degree), parameter_id, feats, site, subject_id, timepoint_rank) %>%
-  head(50) %>%
+  head(25) %>%
   knitr::kable()
 ```
 
@@ -237,35 +255,48 @@ ctas_anomaly %>%
 |    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |              1 |          24 |     1 |
 |    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |              4 |         259 |     1 |
 |    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |              5 |        2610 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |              7 |       26126 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |              8 |      261277 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |              9 |     2612791 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |             10 |    26127931 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |             11 |   261279329 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |             12 |  2612793310 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site1 | sample_site1-01-717-1004 |             13 | 26127933116 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1023 |              1 |          23 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1023 |              4 |         260 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1023 |              5 |        2638 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1033 |              1 |          16 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1033 |              4 |         195 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1033 |              5 |        1964 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |              1 |          15 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |              4 |         169 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |              5 |        1711 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |              7 |       17125 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |              8 |      171274 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |              9 |     1712760 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |             10 |    17127621 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |             11 |   171276233 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |             12 |  1712762345 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-701-1034 |             13 | 17127623468 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-704-1010 |              1 |           9 |     1 |
-|    1 |             10 | autocorr | Alanine Aminotransferase | sample_site2 | sample_site2-01-704-1010 |              4 |          96 |     1 |
+
+### Scores
+
+Maximum scores obtained for each site in each iteration from all
+autogenerated time series can be reviewed.
 
 ``` r
-plan(sequential)
+
+ctas_scores <- arrow::read_parquet("ctas_avgfeat_scores.parquet")
+
+ctas_scores %>%
+  head(25) %>%
+  knitr::kable()
 ```
+
+| iter | anomaly_degree | feats   | site | parameter_id             | max_score |
+|-----:|---------------:|:--------|:-----|:-------------------------|----------:|
+|    1 |              0 | average | 709  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 708  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 718  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 716  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 710  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 704  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 701  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 705  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 717  | Alanine Aminotransferase |         1 |
+|    1 |              0 | average | 703  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 707  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 715  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 711  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 713  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 706  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 714  | Alanine Aminotransferase |         0 |
+|    1 |              0 | average | 709  | Pulse Rate               |         0 |
+|    1 |              0 | average | 708  | Pulse Rate               |         0 |
+|    1 |              0 | average | 718  | Pulse Rate               |         0 |
+|    1 |              0 | average | 716  | Pulse Rate               |         0 |
+|    1 |              0 | average | 710  | Pulse Rate               |         0 |
+|    1 |              0 | average | 704  | Pulse Rate               |         0 |
+|    1 |              0 | average | 701  | Pulse Rate               |         0 |
+|    1 |              0 | average | 705  | Pulse Rate               |         0 |
+|    1 |              0 | average | 717  | Pulse Rate               |         0 |
 
 ## Publication
 

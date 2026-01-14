@@ -9,7 +9,7 @@ scores, and summarizing performance metrics."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">ctasval</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.6</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.7</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -158,6 +158,18 @@ Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling,
 <span class="r-in"><span>  parallel <span class="op">=</span> <span class="cn">FALSE</span>,</span></span>
 <span class="r-in"><span>  iter <span class="op">=</span> <span class="fl">1</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span class="warning">Warning: </span>There were 12 warnings in `mutate()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> The first warning was:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> In argument: `max_score = max(.data$score, na.rm = TRUE)`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by warning:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> There were 6 warnings in `summarize()`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> The first warning was:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> In argument: `max_score = max(.data$score, na.rm = TRUE)`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> In group 6: `site = "714"` `parameter_id = "Alkaline Phosphatase"`.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> Caused by warning in `max()`:</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #BBBB00;">!</span> no non-missing arguments to max; returning -Inf</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Run `dplyr::last_dplyr_warnings()` to see the 5 remaining warnings.</span>
+<span class="r-wrn co"><span class="r-pr">#&gt;</span> <span style="color: #00BBBB;">ℹ</span> Run `dplyr::last_dplyr_warnings()` to see the 11 remaining warnings.</span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">ctas</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $result</span>
@@ -178,26 +190,42 @@ Kolmogorov-Smirnov, "mixedeffects" = mixed effects modelling,
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">12</span>           50   sd      Alkaline Phosphat…    17     2     0     1 0.333     0</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> $anomaly</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3,358 × 39</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>     iter anomaly_degree fun_anomaly feats   STUDYID      DOMAIN subject_id LBSEQ</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;list&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…     2</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…    39</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…    74</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   104</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   134</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   164</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   199</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   229</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…   259</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     1              0 <span style="color: #949494;">&lt;fn&gt;</span>        average CDISCPILOT01 LB     sample_si…     2</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 3,358 × 38</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     iter anomaly_degree feats   STUDYID  DOMAIN subject_id LBSEQ LBTESTCD LBTEST</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>  <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>      <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1              0 average CDISCPI… LB     sample_si…     2 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     1              0 average CDISCPI… LB     sample_si…    39 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     1              0 average CDISCPI… LB     sample_si…    74 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     1              0 average CDISCPI… LB     sample_si…   104 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     1              0 average CDISCPI… LB     sample_si…   134 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     1              0 average CDISCPI… LB     sample_si…   164 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     1              0 average CDISCPI… LB     sample_si…   199 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     1              0 average CDISCPI… LB     sample_si…   229 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     1              0 average CDISCPI… LB     sample_si…   259 ALP      Alkal…</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     1              0 average CDISCPI… LB     sample_si…     2 ALP      Alkal…</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 3,348 more rows</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 31 more variables: LBTESTCD &lt;chr&gt;, LBTEST &lt;chr&gt;, LBCAT &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBORRES &lt;chr&gt;, LBORRESU &lt;chr&gt;, LBORNRLO &lt;chr&gt;, LBORNRHI &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBSTRESC &lt;chr&gt;, LBSTRESN &lt;dbl&gt;, LBSTRESU &lt;chr&gt;, LBSTNRLO &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBSTNRHI &lt;dbl&gt;, LBNRIND &lt;chr&gt;, LBBLFL &lt;chr&gt;, VISITNUM &lt;dbl&gt;, VISIT &lt;chr&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   VISITDY &lt;dbl&gt;, LBDTC &lt;chr&gt;, LBDY &lt;dbl&gt;, timepoint_rank &lt;dbl&gt;,</span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   timepoint_1_name &lt;chr&gt;, result &lt;dbl&gt;, parameter_id &lt;chr&gt;, …</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 29 more variables: LBCAT &lt;chr&gt;, LBORRES &lt;chr&gt;, LBORRESU &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBORNRLO &lt;chr&gt;, LBORNRHI &lt;chr&gt;, LBSTRESC &lt;chr&gt;, LBSTRESN &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBSTRESU &lt;chr&gt;, LBSTNRLO &lt;dbl&gt;, LBSTNRHI &lt;dbl&gt;, LBNRIND &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBBLFL &lt;chr&gt;, VISITNUM &lt;dbl&gt;, VISIT &lt;chr&gt;, VISITDY &lt;dbl&gt;, LBDTC &lt;chr&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   LBDY &lt;dbl&gt;, timepoint_rank &lt;dbl&gt;, timepoint_1_name &lt;chr&gt;, result &lt;dbl&gt;,</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;">#   parameter_id &lt;chr&gt;, parameter_name &lt;chr&gt;, timepoint_2_name &lt;chr&gt;, …</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> $scores</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># A tibble: 240 × 6</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>     iter anomaly_degree feats   site  parameter_id         max_score</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>   <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 1</span>     1              0 average 718   Alkaline Phosphatase         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 2</span>     1              0 average 703   Alkaline Phosphatase         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 3</span>     1              0 average 701   Alkaline Phosphatase         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 4</span>     1              0 average 708   Alkaline Phosphatase         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 5</span>     1              0 average 716   Alkaline Phosphatase         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 6</span>     1              0 average 714   Alkaline Phosphatase      -<span style="color: #BB0000;">Inf</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 7</span>     1              0 average 710   Alkaline Phosphatase         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 8</span>     1              0 average 704   Alkaline Phosphatase      -<span style="color: #BB0000;">Inf</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;"> 9</span>     1              0 average 713   Alkaline Phosphatase      -<span style="color: #BB0000;">Inf</span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #BCBCBC;">10</span>     1              0 average 711   Alkaline Phosphatase         0</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> <span style="color: #949494;"># ℹ 230 more rows</span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> attr(,"class")</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> [1] "ctasval_aggregated"</span>

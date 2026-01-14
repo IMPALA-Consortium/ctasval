@@ -1,5 +1,10 @@
 # Changelog
 
+## ctasval v0.0.7
+
+- save ctas scores
+- remove fun_anomaly column from anomaly results
+
 ## ctasval v0.0.6
 
 - adapt tp ctas v0.4.0 with default padjust_method = “BY”
